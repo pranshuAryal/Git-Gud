@@ -1,0 +1,48 @@
+# --- Node.js / Dependencies ---
+node_modules/
+**/node_modules/
+.pnp
+.pnp.js
+
+# --- Build Output ---
+dist/
+**/dist/
+build/
+**/build/
+.next/
+out/
+
+# --- Environment & Secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Logs & Debug ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# --- IDE & OS Files ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- TypeScript ---
+*.tsbuildinfo
+
+# Prisma generated folders
+/generated/prisma
+
+# Vercel deployment files
+.vercel
+
+# Next.js specific
+next-env.d.ts
+
+# Coverage (from backend)
+/coverage
+
+# Misc security
+*.pem

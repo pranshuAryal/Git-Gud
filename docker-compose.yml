@@ -2,7 +2,7 @@ services:
   # 1. Database Container
   postgres:
     image: postgres:15-alpine
-    container_name: aggregator_db
+    container_name: GitGud_db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -12,14 +12,20 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-      - aggregator_network
+      - GitGud_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # 2. NestJS Backend Container
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: aggregator_backend
+    container_name: GitGud_backend
+    user: "${UID}:${GID}"
     ports:
       - "${API_PORT}:4000"
     environment:
@@ -29,16 +35,18 @@ services:
       - ./backend:/app
       - /app/node_modules
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
-      - aggregator_network
+      - GitGud_network
 
   # 3. NextJS Frontend Container
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: aggregator_frontend
+    container_name: GitGud_frontend
+    user: "${UID}:${GID}"
     ports:
       - "3000:3000"
     environment:
@@ -47,11 +55,11 @@ services:
       - ./frontend:/app
       - /app/node_modules
     networks:
-      - aggregator_network
+      - GitGud_network
 
 volumes:
   pgdata:
 
 networks:
-  aggregator_network:
+  GitGud_network:
     driver: bridge

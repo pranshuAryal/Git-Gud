@@ -1,0 +1,284 @@
+.container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ---------- LEFT PANEL ---------- */
+
+.leftPanel {
+  flex: 1 1 50%;
+  background: linear-gradient(160deg, #7b73d1 0%, #5b52b8 45%, #453d96 100%);
+  color: #ffffff;
+  padding: 64px 72px;
+  
+  /* 👇 CSS Grid magic: Centers the entire content block, but keeps elements left-aligned */
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  text-align: left;
+}
+
+.brandHeader {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px; /* Slightly reduced */
+}
+
+.logoIcon {
+  width: 52px; /* Down from 60px */
+  height: 52px; /* Down from 60px */
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logoIcon svg {
+  width: 28px; /* Down from 34px */
+  height: 28px; /* Down from 34px */
+}
+
+.brandName {
+  font-size: 28px; /* Down from 32px */
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.tagline {
+  margin-top: 36px; /* Down from 48px */
+  max-width: none;
+  white-space: nowrap;
+  font-size: 18px; /* Down from 21px */
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.featuresList {
+  margin-top: 48px; /* Down from 64px */
+  display: flex;
+  flex-direction: column;
+  gap: 24px; /* Down from 30px */
+  max-width: 420px;
+  text-align: left;
+}
+
+.featureRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px; /* Down from 18px */
+}
+
+.featureIcon {
+  width: 40px; /* Down from 48px */
+  height: 40px; /* Down from 48px */
+  border-radius: 10px; /* Down from 12px */
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #ffffff;
+}
+
+.featureIcon svg {
+  width: 18px; /* Down from 22px */
+  height: 18px; /* Down from 22px */
+}
+
+.featureTitle {
+  margin: 0;
+  font-size: 16px; /* Down from 18px */
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.featureDesc {
+  margin: 4px 0 0;
+  font-size: 13.5px; /* Down from 15px */
+  color: rgba(255, 255, 255, 0.62);
+}
+
+/* ---------- RIGHT PANEL ---------- */
+
+.rightPanel {
+  flex: 1 1 50%;
+  background: #fafafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px;
+}
+
+.formCard {
+  width: 100%;
+  max-width: 380px;
+}
+
+.tabContainer {
+  display: flex;
+  background: #eceef2;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 32px;
+}
+
+.tabButton {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.activeTab {
+  background: #ffffff;
+  color: #4f46a8;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.welcomeTitle {
+  margin: 0 0 4px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  text-align: center;
+}
+
+.welcomeSubtitle {
+  margin: 0 0 32px;
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.errorBanner {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+}
+
+.input {
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input::placeholder {
+  color: #9ca3af;
+}
+
+.input:focus {
+  border-color: #4f46a8;
+  box-shadow: 0 0 0 3px rgba(79, 70, 168, 0.12);
+}
+
+.forgotPassword {
+  align-self: flex-end;
+  margin-top: -8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4f46a8;
+  text-decoration: none;
+}
+
+.forgotPassword:hover {
+  text-decoration: underline;
+}
+
+.submitButton {
+  margin-top: 4px;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #4f46a8;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #443c93;
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toggleText {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.toggleLink {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4f46a8;
+  cursor: pointer;
+}
+
+.toggleLink:hover {
+  text-decoration: underline;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 900px) {
+  .leftPanel {
+    display: none;
+  }
+
+  .rightPanel {
+    flex: 1 1 100%;
+  }
+}

@@ -1,154 +1,16 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-}
-
-enum Role {
-  STUDENT
-  INSTRUCTOR
-  ADMIN
-}
-
-enum NodeType {
-  FOLDER
-  FILE
-}
-
-enum RequestStatus {
-  PENDING
-  MERGED
-  REJECTED
+  url      = env("DATABASE_URL")
 }
 
 model User {
   id        String   @id @default(uuid())
-  name      String
   email     String   @unique
+  username  String   @unique
   password  String
-  college   String
-  semester  Int
-  avatar    String?
   createdAt DateTime @default(now())
-
-  repositories  Repository[]   @relation("UserRepos")
-  versions      Version[]      @relation("UserVersions")
-  forks         Fork[]         @relation("UserForks")
-  mergeRequests MergeRequest[] @relation("UserSubmissions")
-  comments      Comment[]      @relation("UserComments")
-  stars         Star[]         @relation("UserStars")
-}
-
-model Repository {
-  id          String   @id @default(uuid())
-  name        String
-  subject     String
-  semester    Int
-  university  String
-  description String?
-  isPublic    Boolean  @default(true)
-  ownerId     String
-  createdAt   DateTime @default(now())
-
-  owner         User           @relation("UserRepos", fields: [ownerId], onDelete: Cascade, references: [id])
-  nodes         Node[]
-  mergeRequests MergeRequest[]
-  stars         Star[]
-
-  forkedFrom    Fork[] @relation("OriginalRepo")
-  forkedTargets Fork[] @relation("ForkedRepo")
-}
-
-model Node {
-  id        String   @id @default(uuid())
-  repoId    String
-  parentId  String?
-  name      String
-  type      NodeType
-  content   Json? // Nullable if folder, stores TipTap JSON if file
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-
-  repository Repository @relation(fields: [repoId], onDelete: Cascade, references: [id])
-
-  // Self-referential hierarchy mechanics (Adjacency List model)
-  parent   Node?  @relation("FolderHierarchy", fields: [parentId], onDelete: Cascade, references: [id])
-  children Node[] @relation("FolderHierarchy")
-
-  versions      Version[]
-  mergeRequests MergeRequest[]
-  comments      Comment[]
-}
-
-model Version {
-  id            String   @id @default(uuid())
-  nodeId        String
-  editedBy      String
-  content       Json
-  changeSummary String
-  createdAt     DateTime @default(now())
-
-  node   Node @relation(fields: [nodeId], onDelete: Cascade, references: [id])
-  editor User @relation("UserVersions", fields: [editedBy], onDelete: Cascade, references: [id])
-}
-
-model Fork {
-  id             String   @id @default(uuid())
-  originalRepoId String
-  forkedRepoId   String
-  forkedBy       String
-  createdAt      DateTime @default(now())
-
-  originalRepo Repository @relation("OriginalRepo", fields: [originalRepoId], onDelete: Cascade, references: [id])
-  forkedRepo   Repository @relation("ForkedRepo", fields: [forkedRepoId], onDelete: Cascade, references: [id])
-  user         User       @relation("UserForks", fields: [forkedBy], onDelete: Cascade, references: [id])
-}
-
-model MergeRequest {
-  id          String        @id @default(uuid())
-  repoId      String
-  nodeId      String
-  submittedBy String
-  title       String
-  description String?
-  oldContent  Json
-  newContent  Json
-  status      RequestStatus @default(PENDING)
-  feedback    String?
-  createdAt   DateTime      @default(now())
-
-  repository Repository @relation(fields: [repoId], onDelete: Cascade, references: [id])
-  node       Node       @relation(fields: [nodeId], onDelete: Cascade, references: [id])
-  user       User       @relation("UserSubmissions", fields: [submittedBy], onDelete: Cascade, references: [id])
-}
-
-model Comment {
-  id        String   @id @default(uuid())
-  nodeId    String
-  authorId  String
-  content   String
-  createdAt DateTime @default(now())
-
-  node   Node @relation(fields: [nodeId], onDelete: Cascade, references: [id])
-  author User @relation("UserComments", fields: [authorId], onDelete: Cascade, references: [id])
-}
-
-model Star {
-  id        String   @id @default(uuid())
-  userId    String
-  repoId    String
-  createdAt DateTime @default(now())
-
-  user       User       @relation("UserStars", fields: [userId], onDelete: Cascade, references: [id])
-  repository Repository @relation(fields: [repoId], onDelete: Cascade, references: [id])
-
-  @@unique([userId, repoId]) // Enforces that a user can only star a repository once
 }
