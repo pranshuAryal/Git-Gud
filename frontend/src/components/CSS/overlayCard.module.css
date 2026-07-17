@@ -1,0 +1,84 @@
+.overlayMask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(26, 28, 30, 0.4); /* Smooth backdrop tint */
+  backdrop-filter: blur(3px); /* Glass blur effect */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100; /* Stays securely on top of the navbar */
+}
+
+.cardContainer {
+  background-color: #ffffff;
+  border: 1px solid #eef0f3;
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.warningIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background-color: #fef2f2;
+  color: #ef4444;
+  border-radius: 50%;
+  margin-bottom: 14px;
+}
+
+.messageText {
+  font-size: 0.95rem;
+  color: #374151;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 0 0 20px 0;
+}
+
+.actionGroup {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.cancelButton, .confirmButton {
+  flex: 1;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelButton {
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+.cancelButton:hover {
+  background-color: #e2e8f0;
+}
+
+.confirmButton {
+  background-color: #e11d48; /* Premium warning red tint */
+  border: 1px solid #e11d48;
+  color: #ffffff;
+}
+
+.confirmButton:hover {
+  background-color: #be123c;
+  border-color: #be123c;
+}

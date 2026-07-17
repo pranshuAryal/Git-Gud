@@ -1,12 +1,14 @@
 FROM node:20-alpine
 
+RUN mkdir -p /app && chown -R 1000:1000 /app
 WORKDIR /app
 
-COPY package*.json ./
+USER 1000
 
+COPY --chown=1000:1000 package*.json ./
 RUN npm install
 
-COPY . .
+COPY --chown=1000:1000 . .
 
 EXPOSE 3000
 
