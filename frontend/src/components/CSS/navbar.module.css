@@ -12,6 +12,30 @@
   box-sizing: border-box;
 }
 
+.leftContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hamburgerButton {
+  background: none;
+  border: none;
+  color: #475569;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.hamburgerButton:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
 .brandLink {
   display: flex;
   align-items: center;
