@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -14,5 +13,144 @@ model User {
   password  String
   createdAt DateTime @default(now())
 
+  repositories Repository[] @relation("RepoOwner")
+  versions     Version[]    @relation("VersionEditor")
+  forks        Fork[]       @relation("ForkCreator")
+  mergeRequests MergeRequest[] @relation("MRSubmitter")
+  stars        Star[]
+  comments     Comment[]
+
   @@map("user")
+}
+
+model Repository {
+  id           String   @id @default(uuid())
+  ownerId      String
+  owner        User     @relation("RepoOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  name         String
+  description  String?
+  isPublic     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  forkedFromId String?
+  forkedFrom   Repository?  @relation("RepoForkPointer", fields: [forkedFromId], references: [id])
+  forkedCopies Repository[] @relation("RepoForkPointer")
+
+  sections      Section[]
+  forksMade     Fork[]         @relation("OriginalRepo")
+  forkOrigin    Fork?          @relation("ForkedRepo")
+  mergeRequests MergeRequest[]
+  stars         Star[]
+
+  @@unique([ownerId, name])
+  @@map("repository")
+}
+
+model Section {
+  id        String     @id @default(uuid())
+  repoId    String
+  repo      Repository @relation(fields: [repoId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    Section?   @relation("SectionChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Section[]  @relation("SectionChildren")
+  title     String
+  order     Int
+  createdAt DateTime   @default(now())
+
+  note Note?
+
+  @@index([repoId])
+  @@index([parentId])
+  @@map("section")
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  sectionId String   @unique
+  section   Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  content   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  versions      Version[]
+  mergeRequests MergeRequest[]
+
+  @@map("note")
+}
+
+model Version {
+  id            String   @id @default(uuid())
+  noteId        String
+  note          Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  editedBy      String
+  editor        User     @relation("VersionEditor", fields: [editedBy], references: [id])
+  content       Json
+  changeSummary String?
+  createdAt     DateTime @default(now())
+
+  @@index([noteId])
+  @@map("version")
+}
+
+model Fork {
+  id             String     @id @default(uuid())
+  originalRepoId String
+  originalRepo   Repository @relation("OriginalRepo", fields: [originalRepoId], references: [id], onDelete: Cascade)
+  forkedRepoId   String     @unique
+  forkedRepo     Repository @relation("ForkedRepo", fields: [forkedRepoId], references: [id], onDelete: Cascade)
+  forkedBy       String
+  creator        User       @relation("ForkCreator", fields: [forkedBy], references: [id])
+  createdAt      DateTime   @default(now())
+
+  @@index([originalRepoId])
+  @@map("fork")
+}
+
+model MergeRequest {
+  id          String   @id @default(uuid())
+  repoId      String
+  repo        Repository @relation(fields: [repoId], references: [id], onDelete: Cascade)
+  noteId      String
+  note        Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  submittedBy String
+  submitter   User     @relation("MRSubmitter", fields: [submittedBy], references: [id])
+  title       String
+  description String?
+  oldContent  Json
+  newContent  Json
+  status      String   @default("pending") // pending | approved | rejected | cancelled
+  feedback    String?
+  createdAt   DateTime @default(now())
+
+  comments Comment[]
+
+  @@index([repoId])
+  @@index([status])
+  @@map("merge_request")
+}
+
+model Star {
+  id        String     @id @default(uuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  repoId    String
+  repo      Repository @relation(fields: [repoId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now())
+
+  @@unique([userId, repoId])
+  @@map("star")
+}
+
+model Comment {
+  id             String       @id @default(uuid())
+  mergeRequestId String
+  mergeRequest   MergeRequest @relation(fields: [mergeRequestId], references: [id], onDelete: Cascade)
+  authorId       String
+  author         User         @relation(fields: [authorId], references: [id])
+  content        String
+  createdAt      DateTime     @default(now())
+
+  @@index([mergeRequestId])
+  @@map("comment")
 }
