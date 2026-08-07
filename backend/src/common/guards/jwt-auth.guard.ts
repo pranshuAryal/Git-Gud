@@ -9,7 +9,10 @@ import { verifyToken } from '../utils/jwt.utils';
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
+    
     const req = context.switchToHttp().getRequest();
+    console.log('RAW cookie header:', req.headers.cookie);
+    console.log('PARSED req.cookies:', req.cookies);
     const token = req.cookies?.gitgud_token;
 
     if (!token) {

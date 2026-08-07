@@ -7,17 +7,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <LayoutProvider>
       <div
-        style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+        style={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}
       >
-        {/* Navbar sits flatly along the top */}
         <Navbar />
 
-        {/* Layout Wrapper Area */}
-        <div style={{ display: "flex", flex: 1, position: "relative" }}>
+        <div style={{ display: "flex", flex: 1, position: "relative", minHeight: 0 }}>
           <SidePanel />
 
-          {/* Dashboard contents fill remaining browser frame space */}
-          <main style={{ flex: 1, backgroundColor: "#f8fafc", minWidth: 0 }}>
+          <main style={{ flex: 1, backgroundColor: "#f8fafc", minWidth: 0, overflowY: "auto" }}>
             {children}
           </main>
         </div>
