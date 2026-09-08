@@ -8,7 +8,10 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRepositoryDto } from './dto/create-repository.dto';
 import { UpdateRepositoryDto } from './dto/update-repository.dto';
-import { ListRepositoriesQueryDto, RepoScope } from './dto/list-repositories-query.dto';
+import {
+  ListRepositoriesQueryDto,
+  RepoScope,
+} from './dto/list-repositories-query.dto';
 import { CreateSectionDto } from './dto/create-section.dto';
 import { UpdateSectionDto } from './dto/update-section.dto';
 import { SaveNoteDto } from './dto/save-note.dto';
@@ -29,7 +32,7 @@ const CARD_SELECT = {
 interface SectionInput {
   title: string;
   order: number;
-  note?: { content: any };
+  note?: { content: any; originNoteId?: string | null };
   children?: SectionInput[];
 }
 
@@ -48,7 +51,9 @@ export class RepoService {
       where: { ownerId_name: { ownerId, name: dto.name } },
     });
     if (existing) {
-      throw new ConflictException('You already have a repository with this name');
+      throw new ConflictException(
+        'You already have a repository with this name',
+      );
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -76,7 +81,11 @@ export class RepoService {
 
           if (s.note) {
             const note = await tx.note.create({
-              data: { sectionId: section.id, content: s.note.content },
+              data: {
+                sectionId: section.id,
+                content: s.note.content,
+                originNoteId: s.note.originNoteId ?? null,
+              },
             });
             createdNotes.push({ noteId: note.id, content: s.note.content });
           }
@@ -107,6 +116,9 @@ export class RepoService {
       case RepoScope.DISCOVER:
         where.isPublic = true;
         break;
+      case RepoScope.STARRED:
+        where.stars = { some: { userId } };
+        break;
     }
 
     if (search) {
@@ -136,7 +148,11 @@ export class RepoService {
       include: {
         owner: { select: { id: true, username: true } },
         forkedFrom: {
-          select: { id: true, name: true, owner: { select: { username: true } } },
+          select: {
+            id: true,
+            name: true,
+            owner: { select: { username: true } },
+          },
         },
         sections: { include: { note: true }, orderBy: { order: 'asc' } },
         _count: { select: { stars: true, forksMade: true, sections: true } },
@@ -148,7 +164,7 @@ export class RepoService {
       throw new ForbiddenException('This repository is private');
     }
 
-    return repo;
+    return { ...repo, editable: repo.ownerId === userId };
   }
 
   async updateRepository(userId: string, id: string, dto: UpdateRepositoryDto) {
@@ -202,7 +218,11 @@ export class RepoService {
         }),
       ),
       this.prisma.fork.create({
-        data: { originalRepoId: original.id, forkedRepoId: repo.id, forkedBy: userId },
+        data: {
+          originalRepoId: original.id,
+          forkedRepoId: repo.id,
+          forkedBy: userId,
+        },
       }),
     ]);
 
@@ -219,7 +239,10 @@ export class RepoService {
         where: { id: dto.parentId, repoId },
         include: { note: true },
       });
-      if (!parent) throw new NotFoundException('Parent section not found in this repository');
+      if (!parent)
+        throw new NotFoundException(
+          'Parent section not found in this repository',
+        );
       if (parent.note) {
         throw new ConflictException(
           'This section already has a note attached and cannot contain sub-sections',
@@ -246,8 +269,11 @@ export class RepoService {
   ) {
     await this.assertOwnership(userId, repoId);
 
-    const section = await this.prisma.section.findFirst({ where: { id: sectionId, repoId } });
-    if (!section) throw new NotFoundException('Section not found in this repository');
+    const section = await this.prisma.section.findFirst({
+      where: { id: sectionId, repoId },
+    });
+    if (!section)
+      throw new NotFoundException('Section not found in this repository');
 
     if (dto.parentId !== undefined && dto.parentId !== null) {
       if (dto.parentId === sectionId) {
@@ -257,9 +283,12 @@ export class RepoService {
         where: { id: dto.parentId, repoId },
         include: { note: true },
       });
-      if (!newParent) throw new NotFoundException('Target parent section not found');
+      if (!newParent)
+        throw new NotFoundException('Target parent section not found');
       if (newParent.note) {
-        throw new ConflictException('Target section already has a note attached');
+        throw new ConflictException(
+          'Target section already has a note attached',
+        );
       }
     }
 
@@ -276,8 +305,11 @@ export class RepoService {
   async deleteSection(userId: string, repoId: string, sectionId: string) {
     await this.assertOwnership(userId, repoId);
 
-    const section = await this.prisma.section.findFirst({ where: { id: sectionId, repoId } });
-    if (!section) throw new NotFoundException('Section not found in this repository');
+    const section = await this.prisma.section.findFirst({
+      where: { id: sectionId, repoId },
+    });
+    if (!section)
+      throw new NotFoundException('Section not found in this repository');
 
     await this.prisma.section.delete({ where: { id: sectionId } });
     return { success: true };
@@ -292,9 +324,12 @@ export class RepoService {
       where: { id: sectionId, repoId },
       include: { children: true, note: true },
     });
-    if (!section) throw new NotFoundException('Section not found in this repository');
+    if (!section)
+      throw new NotFoundException('Section not found in this repository');
     if (section.children.length > 0) {
-      throw new ConflictException('Cannot attach a note to a section that has sub-sections');
+      throw new ConflictException(
+        'Cannot attach a note to a section that has sub-sections',
+      );
     }
     if (section.note) {
       throw new ConflictException('This section already has a note');
@@ -305,7 +340,12 @@ export class RepoService {
     });
   }
 
-  async saveNote(userId: string, repoId: string, noteId: string, dto: SaveNoteDto) {
+  async saveNote(
+    userId: string,
+    repoId: string,
+    noteId: string,
+    dto: SaveNoteDto,
+  ) {
     await this.assertOwnership(userId, repoId);
 
     const note = await this.prisma.note.findFirst({
@@ -314,7 +354,10 @@ export class RepoService {
     if (!note) throw new NotFoundException('Note not found in this repository');
 
     const [updatedNote] = await this.prisma.$transaction([
-      this.prisma.note.update({ where: { id: noteId }, data: { content: dto.content } }),
+      this.prisma.note.update({
+        where: { id: noteId },
+        data: { content: dto.content },
+      }),
       this.prisma.version.create({
         data: {
           noteId,
@@ -328,12 +371,188 @@ export class RepoService {
     return updatedNote;
   }
 
+  async getNote(userId: string, repoId: string, noteId: string) {
+    const repo = await this.prisma.repository.findUnique({
+      where: { id: repoId },
+      select: { id: true, isPublic: true, ownerId: true },
+    });
+    if (!repo) throw new NotFoundException('Repository not found');
+    if (!repo.isPublic && repo.ownerId !== userId) {
+      throw new ForbiddenException('This repository is private');
+    }
+
+    const note = await this.prisma.note.findFirst({
+      where: { id: noteId, section: { repoId } },
+      include: { section: { select: { id: true, title: true } } },
+    });
+    if (!note) throw new NotFoundException('Note not found in this repository');
+
+    const versions = await this.prisma.version.findMany({
+      where: { noteId },
+      include: {
+        editor: { select: { id: true, username: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return {
+      id: note.id,
+      content: note.content,
+      updatedAt: note.updatedAt,
+      section: note.section,
+      lastVersion: versions[0]
+        ? { editedBy: versions[0].editor, createdAt: versions[0].createdAt }
+        : null,
+      versionNumber: versions.length ? 1 : 0,
+      versions: versions.slice(0, 10).map((v) => ({
+        id: v.id,
+        changeSummary: v.changeSummary,
+        createdAt: v.createdAt,
+        editedBy: v.editor,
+      })),
+    };
+  }
+
+  async listNoteVersions(userId: string, repoId: string, noteId: string) {
+    const note = await this.prisma.note.findFirst({
+      where: { id: noteId, section: { repoId } },
+    });
+    if (!note) throw new NotFoundException('Note not found in this repository');
+
+    return this.prisma.version.findMany({
+      where: { noteId },
+      include: {
+        editor: { select: { id: true, username: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  // ================= STARS =================
+
+  async starRepository(userId: string, repoId: string) {
+    const repo = await this.prisma.repository.findUnique({
+      where: { id: repoId },
+    });
+    if (!repo) throw new NotFoundException('Repository not found');
+
+    const existing = await this.prisma.star.findUnique({
+      where: { userId_repoId: { userId, repoId } },
+    });
+    if (existing)
+      throw new ConflictException('Already starred this repository');
+
+    await this.prisma.star.create({ data: { userId, repoId } });
+    return { starred: true };
+  }
+
+  async unstarRepository(userId: string, repoId: string) {
+    const existing = await this.prisma.star.findUnique({
+      where: { userId_repoId: { userId, repoId } },
+    });
+    if (!existing) throw new NotFoundException('Star not found');
+
+    await this.prisma.star.delete({ where: { id: existing.id } });
+    return { starred: false };
+  }
+
+  async checkStarred(
+    userId: string,
+    repoId: string,
+  ): Promise<{ starred: boolean }> {
+    const existing = await this.prisma.star.findUnique({
+      where: { userId_repoId: { userId, repoId } },
+    });
+    return { starred: !!existing };
+  }
+
+  // ================= PROFILES =================
+
+  async getUserProfile(viewerId: string, userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, username: true, createdAt: true },
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    const isSelf = viewerId === userId;
+
+    const [counts, publicRepos] = await this.prisma.$transaction([
+      this.prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          _count: {
+            select: {
+              repositories: {
+                where: {
+                  forkedFromId: null,
+                  ...(isSelf ? {} : { isPublic: true }),
+                },
+              },
+              stars: isSelf ? true : { where: { repo: { isPublic: true } } },
+              comments: true,
+            },
+          },
+        },
+      }),
+      this.prisma.repository.findMany({
+        where: {
+          ownerId: userId,
+          ...(isSelf ? {} : { isPublic: true }),
+          forkedFromId: null,
+        },
+        select: CARD_SELECT,
+        orderBy: { updatedAt: 'desc' },
+        take: 50,
+      }),
+    ]);
+
+    const [
+      forksMade,
+      starsReceived,
+      mergeRequestsReceived,
+      mergeRequestsSubmitted,
+    ] = await this.prisma.$transaction([
+      this.prisma.fork.count({ where: { forkedBy: userId } }),
+      this.prisma.star.count({
+        where: {
+          repo: {
+            ownerId: userId,
+            ...(isSelf ? {} : { isPublic: true }),
+          },
+        },
+      }),
+      this.prisma.mergeRequest.count({ where: { repo: { ownerId: userId } } }),
+      this.prisma.mergeRequest.count({ where: { submittedBy: userId } }),
+    ]);
+
+    return {
+      profile: {
+        id: user.id,
+        username: user.username,
+        createdAt: user.createdAt,
+      },
+      isSelf,
+      counts: {
+        repositories: counts?._count?.repositories ?? 0,
+        forksMade,
+        starsReceived,
+        mergeRequestsReceived,
+        mergeRequestsSubmitted,
+      },
+      repositories: publicRepos,
+    };
+  }
+
   // ================= PRIVATE HELPERS =================
 
   private async assertOwnership(userId: string, repoId: string) {
-    const repo = await this.prisma.repository.findUnique({ where: { id: repoId } });
+    const repo = await this.prisma.repository.findUnique({
+      where: { id: repoId },
+    });
     if (!repo) throw new NotFoundException('Repository not found');
-    if (repo.ownerId !== userId) throw new ForbiddenException('Not your repository');
+    if (repo.ownerId !== userId)
+      throw new ForbiddenException('Not your repository');
     return repo;
   }
 
@@ -343,7 +562,7 @@ export class RepoService {
       parentId: string | null;
       title: string;
       order: number;
-      note: { content: any } | null;
+      note: { id: string; content: any } | null;
     }[],
   ): SectionInput[] {
     const byParent = new Map<string | null, typeof flat>();
@@ -357,29 +576,34 @@ export class RepoService {
       (byParent.get(parentId) ?? []).map((s) => ({
         title: s.title,
         order: s.order,
-        note: s.note ? { content: s.note.content } : undefined,
+        note: s.note
+          ? { content: s.note.content, originNoteId: s.note.id }
+          : undefined,
         children: build(s.id),
       }));
 
     return build(null);
   }
 
-  private async resolveForkName(userId: string, baseName: string): Promise<string> {
-  const existing = await this.prisma.repository.findUnique({
-    where: { ownerId_name: { ownerId: userId, name: baseName } },
-  });
-  if (!existing) return baseName;
+  private async resolveForkName(
+    userId: string,
+    baseName: string,
+  ): Promise<string> {
+    const existing = await this.prisma.repository.findUnique({
+      where: { ownerId_name: { ownerId: userId, name: baseName } },
+    });
+    if (!existing) return baseName;
 
-  let suffix = 2;
-  let candidate = `${baseName} (fork)`;
-  while (
-    await this.prisma.repository.findUnique({
-      where: { ownerId_name: { ownerId: userId, name: candidate } },
-    })
-  ) {
-    candidate = `${baseName} (fork ${suffix})`;
-    suffix++;
+    let suffix = 2;
+    let candidate = `${baseName} (fork)`;
+    while (
+      await this.prisma.repository.findUnique({
+        where: { ownerId_name: { ownerId: userId, name: candidate } },
+      })
+    ) {
+      candidate = `${baseName} (fork ${suffix})`;
+      suffix++;
+    }
+    return candidate;
   }
-  return candidate;
-}
 }

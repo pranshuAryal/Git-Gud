@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS "note_originNoteId_key";

@@ -5,6 +5,7 @@ export enum RepoScope {
   OWNED = 'owned',
   FORKED = 'forked',
   DISCOVER = 'discover',
+  STARRED = 'starred',
 }
 
 export class ListRepositoriesQueryDto {

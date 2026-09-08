@@ -4,10 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./CSS/sidePanel.module.css";
 import { useLayout } from "@/app/context/LayoutContext";
+import { useAuth } from "@/app/context/AuthContext";
 
 export default function SidePanel() {
   const pathname = usePathname();
-  const { isSidebarOpen } = useLayout();
+  const { isSidebarOpen, closeSidebar } = useLayout();
+  const { user } = useAuth();
 
   const isDashboard = pathname === "/dashboard" || pathname === "/";
 
@@ -25,10 +27,14 @@ export default function SidePanel() {
   ];
 
   const repoItems = [
-    { label: "My Repositories", icon: "M20 7H4M20 12H4M20 17H4" },
-    { label: "My Forks", icon: "M8 12a4 4 0 108 0 4 4 0 00-8 0z" },
-    { label: "Starred", icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" },
+    { label: "My Repositories", href: "/my-repositories", icon: "M20 7H4M20 12H4M20 17H4" },
+    { label: "My Forks", href: "/my-forks", icon: "M8 12a4 4 0 108 0 4 4 0 00-8 0z" },
+    { label: "Starred", href: "/starred", icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" },
   ];
+
+  const initials = user?.username
+    ? user.username.slice(0, 2).toUpperCase()
+    : "??";
 
   return (
     <aside className={sidebarClassName}>
@@ -36,11 +42,12 @@ export default function SidePanel() {
         {/* Main Section */}
         <nav className={styles.section}>
           {navItems.map((item) => {
-            const isActive = pathname === item.href;
+            const isActive = pathname === item.href || (item.href === "/dashboard" && pathname === "/");
             return (
-              <Link 
-                key={item.label} 
-                href={item.href} 
+              <Link
+                key={item.label}
+                href={item.href}
+                onClick={closeSidebar}
                 className={`${styles.navLink} ${isActive ? styles.activeLink : ""}`}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill={item.stroke ? "none" : "currentColor"} stroke="currentColor" strokeWidth="2">
@@ -55,34 +62,46 @@ export default function SidePanel() {
         {/* Your Repos Section */}
         <div className={styles.section}>
           <h4 className={styles.sectionTitle}>YOUR REPOS</h4>
-          {repoItems.map((item) => (
-            <button key={item.label} className={styles.navLink}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d={item.icon} strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span>{item.label}</span>
-            </button>
-          ))}
+          {repoItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                onClick={closeSidebar}
+                className={`${styles.navLink} ${isActive ? styles.activeLink : ""}`}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d={item.icon} strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
         </div>
 
         {/* Account Section */}
         <div className={styles.section}>
           <h4 className={styles.sectionTitle}>ACCOUNT</h4>
-          <button className={styles.navLink}>
+          <Link
+            href={user?.userId ? `/profile/${user.userId}` : "/profile"}
+            onClick={closeSidebar}
+            className={`${styles.navLink} ${pathname?.startsWith("/profile") ? styles.activeLink : ""}`}
+          >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
             </svg>
             <span>Profile</span>
-          </button>
+          </Link>
         </div>
       </div>
 
       {/* User Footer Profile Card */}
       <div className={styles.userFooter}>
-        <div className={styles.avatar}>RK</div>
+        <div className={styles.avatar}>{initials}</div>
         <div className={styles.userInfo}>
-          <div className={styles.userName}>Raj Kumar</div>
-          <div className={styles.userMeta}>Sem 4 • PU</div>
+          <div className={styles.userName}>{user?.username || "Loading…"}</div>
+          <div className={styles.userMeta}>{user?.email || "Please wait"}</div>
         </div>
       </div>
     </aside>

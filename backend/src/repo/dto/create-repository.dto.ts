@@ -4,12 +4,14 @@ import {
   IsBoolean,
   IsInt,
   IsArray,
+  IsObject,
   ValidateNested,
   MinLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class NoteInputDto {
+  @IsObject()
   content: any;
 }
 

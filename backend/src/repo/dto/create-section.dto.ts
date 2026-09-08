@@ -1,4 +1,10 @@
-import { IsString, IsOptional, IsInt, IsUUID, MinLength } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsInt,
+  IsUUID,
+  MinLength,
+} from 'class-validator';
 
 export class CreateSectionDto {
   @IsString()

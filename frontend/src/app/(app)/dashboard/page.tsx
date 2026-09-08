@@ -34,12 +34,11 @@ function RepoSection({
 
   useEffect(() => {
     let cancelled = false;
-    setRepos(null);
-    setError(null);
 
     fetchRepositories({ scope, limit: PREVIEW_LIMIT, search: search || undefined })
       .then((data) => {
-        if (!cancelled) setRepos(data.items);
+        if (cancelled) return;
+        setRepos(data.items);
       })
       .catch((err) => {
         if (!cancelled) setError(err.message || 'Something went wrong');

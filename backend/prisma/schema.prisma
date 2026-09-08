@@ -66,16 +66,20 @@ model Section {
 }
 
 model Note {
-  id        String   @id @default(uuid())
-  sectionId String   @unique
-  section   Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  id        String    @id @default(uuid())
+  sectionId String    @unique
+  section   Section   @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   content   Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  originNoteId String?
+  originNote Note?    @relation("NoteOrigin", fields: [originNoteId], references: [id], onDelete: SetNull)
+  forkedNotes Note[]  @relation("NoteOrigin")
 
   versions      Version[]
   mergeRequests MergeRequest[]
 
+  @@index([originNoteId])
   @@map("note")
 }
 
