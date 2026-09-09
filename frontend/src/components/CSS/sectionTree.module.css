@@ -1,0 +1,240 @@
+.tree {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+  transition: background 0.1s;
+}
+
+.row:hover {
+  background: #f9f9fb;
+}
+
+.active {
+  background: #f0eefb;
+  border-left-color: #534ab7;
+  border-radius: 8px;
+}
+
+.active:hover {
+  background: #f0eefb;
+}
+
+.selectButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border: none;
+  background: transparent;
+  color: #374151;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.selectButton:hover {
+  color: #111827;
+}
+
+.icon {
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.active .icon {
+  color: #534ab7;
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.active .title {
+  color: #534ab7;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-right: 2px;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.row:hover .actions {
+  opacity: 1;
+}
+
+.chevronButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.chevronButton:hover {
+  background: #f1f5f9;
+  color: #111827;
+}
+
+.chevronIcon {
+  transition: transform 0.15s ease;
+}
+
+.chevronCollapsed {
+  transform: rotate(-90deg);
+}
+
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.actionButton:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.empty {
+  padding: 8px;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ---- inline add row ---- */
+
+.addRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 24px;
+}
+
+.addInput {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #111827;
+  background: #fff;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+
+.addInput:focus {
+  border-color: #534ab7;
+  box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.12);
+}
+
+.confirmButton,
+.cancelButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #fff;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.confirmButton:hover {
+  border-color: #16a34a;
+  color: #16a34a;
+}
+
+.cancelButton:hover {
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.noteActions {
+  padding-left: 24px;
+}
+
+.createNoteButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 4px 0;
+  padding: 5px 10px;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  color: #534ab7;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.createNoteButton:hover {
+  border-color: #534ab7;
+  background: #f0eefb;
+}
+
+.addRootButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 7px 12px;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  color: #534ab7;
+  font-size: 12.5px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.addRootButton:hover {
+  border-color: #534ab7;
+  background: #f0eefb;
+}
+
+.selectedHint {
+  padding: 8px 10px 0;
+  color: #9ca3af;
+  font-size: 11.5px;
+}

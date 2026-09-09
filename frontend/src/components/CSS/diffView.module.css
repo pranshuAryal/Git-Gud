@@ -1,0 +1,121 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid #e5e7eb;
+  background: #fafafa;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.header span {
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.header span + span {
+  border-left: 1px solid #e5e7eb;
+}
+
+.headerOriginal {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.headerProposed {
+  background: #ecfdf5;
+  color: #16a34a;
+}
+
+.scroll {
+  overflow: auto;
+  max-height: 480px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.cell {
+  display: flex;
+  gap: 8px;
+  padding: 3px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  font-family: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.row .cell + .cell {
+  border-left: 1px solid #e5e7eb;
+}
+
+.sign {
+  flex-shrink: 0;
+  width: 12px;
+  font-weight: 700;
+  user-select: none;
+}
+
+.signMinus {
+  color: #b91c1c;
+}
+
+.signPlus {
+  color: #047857;
+}
+
+.lineNum {
+  flex-shrink: 0;
+  width: 30px;
+  color: #b8bec6;
+  text-align: right;
+  user-select: none;
+}
+
+.lineText {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.equal {
+  background: #fff;
+  color: #374151;
+}
+
+.add {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.remove {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.muted {
+  background: #fafafa;
+  color: #d1d5db;
+}
+
+.empty {
+  margin: 0;
+  padding: 24px 16px;
+  color: #9ca3af;
+  font-size: 13px;
+}

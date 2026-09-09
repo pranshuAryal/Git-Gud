@@ -12,6 +12,36 @@
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+@media (max-width: 1200px) {
+  .sidebar {
+    width: 200px;
+  }
+
+  .navLink {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+
+  .userFooter {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 0.75rem;
+  }
+
+  .userName {
+    font-size: 0.8rem;
+  }
+
+  .userMeta {
+    font-size: 0.7rem;
+  }
+}
+
 /* Dashboard mode: standard static left column structural block */
 .dashboardDocked {
   transform: none !important;

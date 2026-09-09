@@ -45,7 +45,13 @@ function moveNode(tree: SectionNode[], id: string, direction: 'up' | 'down'): Se
   return tree.map((node) => ({ ...node, children: moveNode(node.children, id, direction) }));
 }
 
-export function toSectionInput(tree: SectionNode[]): { title: string; order: number; children?: any[] }[] {
+export interface SectionInputPayload {
+  title: string;
+  order: number;
+  children?: SectionInputPayload[];
+}
+
+export function toSectionInput(tree: SectionNode[]): SectionInputPayload[] {
   return tree.map((node, i) => ({
     title: node.title,
     order: i,

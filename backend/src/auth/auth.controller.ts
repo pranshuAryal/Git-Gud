@@ -1,9 +1,18 @@
-import { Body, Controller, Post, Res, HttpCode } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Res,
+  HttpCode,
+  UseGuards,
+} from '@nestjs/common';
 import type { Response } from 'express';
 
 import { AuthService } from './auth.service';
 import { SignupDto, LoginDto } from './dto/auth.dto';
-// import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 const COOKIE_NAME = 'gitgud_token';
 const COOKIE_OPTS = {
@@ -46,9 +55,9 @@ export class AuthController {
     return { success: true };
   }
 
-  // @Get('me')
-  // @UseGuards(JwtAuthGuard)
-  // me(@CurrentUser() user: { userId: string; email: string; username: string }) {
-  //   return user;
-  // }
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  me(@CurrentUser() user: { userId: string; email: string; username: string }) {
+    return user;
+  }
 }

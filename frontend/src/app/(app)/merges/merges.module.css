@@ -1,0 +1,307 @@
+.page {
+  padding: 32px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding: 20px 16px;
+  }
+
+  .tabs {
+    width: 100%;
+    display: flex;
+  }
+
+  .tab {
+    flex: 1;
+  }
+
+  .itemMeta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+.pageTitle {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.pageSubtitle {
+  margin: 0 0 24px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.tabs {
+  display: inline-flex;
+  background: #eceef2;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+
+.tab {
+  padding: 8px 20px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.activeTab {
+  background: #fff;
+  color: #534ab7;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.errorBanner {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.loadingSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeletonLine {
+  height: 96px;
+  border-radius: 12px;
+  background: #e5e7eb;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.emptyState {
+  border: 1px dashed #e5e7eb;
+  border-radius: 12px;
+  padding: 48px 0;
+  text-align: center;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.item {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 18px 22px;
+  background: #fff;
+  transition: border-color 0.15s;
+  cursor: pointer;
+}
+
+.item:hover {
+  border-color: #c4bfea;
+}
+
+.itemHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.itemTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+  min-width: 0;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.statusPending {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.statusApproved {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.statusRejected {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.statusCancelled {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.statusActions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.statusAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #4b5563;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.approveAction {
+  background: #ecfdf5;
+  border-color: #059669;
+  color: #059669;
+}
+
+.approveAction:hover {
+  background: #d1fae5;
+}
+
+.rejectAction {
+  background: #fef2f2;
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.rejectAction:hover {
+  background: #fee2e2;
+}
+
+.cancelAction {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #6b7280;
+}
+
+.cancelAction:hover {
+  background: #e5e7eb;
+}
+
+.itemMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.metaLink {
+  color: #534ab7;
+  font-weight: 600;
+}
+
+.metaLink:hover {
+  text-decoration: underline;
+}
+
+.itemTime {
+  color: #9ca3af;
+}
+
+.itemDescription {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.feedback {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.feedback strong {
+  color: #334155;
+}
+
+.expandButton {
+  margin-top: 12px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: #534ab7;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.expandButton:hover {
+  text-decoration: underline;
+}
+
+.fullLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #534ab7;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.fullLink:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,641 @@
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ---- Skeleton ---- */
+
+.skeleton {
+  height: 96px;
+  border-radius: 12px;
+  background: #f3f4f6;
+  margin-bottom: 12px;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.errorBanner {
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #dc2626;
+  font-size: 14px;
+}
+
+/* ---- Breadcrumb ---- */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.breadcrumbLink {
+  color: #534ab7;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.breadcrumbLink:hover {
+  text-decoration: underline;
+}
+
+.breadcrumbSep {
+  color: #9ca3af;
+}
+
+.breadcrumbCurrent {
+  color: #111827;
+  font-weight: 600;
+}
+
+.forkBadge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f0eefb;
+  color: #534ab7;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.editIndicator {
+  color: #6b7280;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.mrSuccessBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+/* ---- Header ---- */
+
+.repoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.repoTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.headerIcon {
+  color: #534ab7;
+}
+
+.viewReadLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.viewReadLink:hover {
+  border-color: #534ab7;
+  color: #534ab7;
+}
+
+/* ---- Layout ---- */
+
+.contentArea {
+  display: grid;
+  grid-template-columns: 230px 1fr 260px;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 1150px) {
+  .contentArea {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .editorPanel {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding: 16px;
+  }
+
+  .contentArea {
+    grid-template-columns: 1fr;
+  }
+
+  .editorPanel {
+    grid-column: 1;
+    grid-row: auto;
+    order: 1;
+  }
+
+  .treePanel {
+    order: 2;
+  }
+
+  .sidePanel {
+    order: 3;
+  }
+
+  .repoHeader {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .repoTitle {
+    font-size: 20px;
+  }
+
+  .editorHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.treePanel,
+.editorPanel,
+.sidePanel {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.treePanel,
+.sidePanel {
+  padding: 14px;
+}
+
+.editorPanel {
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+}
+
+.panelTitle {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: 0.02em;
+}
+
+/* ---- Editor ---- */
+
+.editorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #fafafa;
+  flex-wrap: wrap;
+}
+
+.editorSectionTitle {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #111827;
+  margin-right: 8px;
+}
+
+.savedIndicator {
+  color: #16a34a;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.unsaved {
+  color: #d97706;
+}
+
+.editorActions {
+  display: flex;
+  gap: 8px;
+}
+
+.previewButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  border: 1px solid #e5e7eb;
+  border-radius: 7px;
+  background: #fff;
+  color: #6b7280;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.previewButton:hover {
+  border-color: #534ab7;
+  color: #534ab7;
+}
+
+.saveVersionButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 7px;
+  background: #534ab7;
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.saveVersionButton:hover:not(:disabled) {
+  background: #463da0;
+}
+
+.saveVersionButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.previewBody {
+  flex: 1;
+  min-height: 0;
+}
+
+.editorFooter {
+  padding: 10px 14px;
+  border-top: 1px solid #e5e7eb;
+  background: #fafafa;
+  flex-shrink: 0;
+}
+
+.summaryInput {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #111827;
+  background: #fff;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+
+.summaryInput:focus {
+  border-color: #534ab7;
+  box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.12);
+}
+
+.emptyNote {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px;
+  color: #9ca3af;
+  text-align: center;
+}
+
+.emptyNoteIcon {
+  color: #d1d5db;
+}
+
+.emptyNoteText {
+  margin: 0;
+  font-size: 13.5px;
+  max-width: 260px;
+}
+
+.createNoteButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  padding: 7px 12px;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  color: #534ab7;
+  font-size: 12.5px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.createNoteButton:hover {
+  border-color: #534ab7;
+  background: #f0eefb;
+}
+
+/* ---- Version history ---- */
+
+.versionsBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-bottom: 10px;
+}
+
+.versionItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 10px;
+  border: 1px solid #f3f4f6;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.versionTopRow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.versionDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #534ab7;
+  flex-shrink: 0;
+}
+
+.versionUser {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.currentBadge {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #16a34a;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.versionTime {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.versionSummary {
+  font-size: 12px;
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.restoreButton {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 3px 9px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #fff;
+  color: #534ab7;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.restoreButton:hover {
+  border-color: #534ab7;
+  background: #f0eefb;
+}
+
+.sidebarEmpty {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 12.5px;
+}
+
+.sideFooter {
+  padding-top: 10px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.submitMrButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #534ab7;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.submitMrButton:hover:not(:disabled) {
+  background: #463da0;
+}
+
+.submitMrButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ---- MR modal ---- */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 24, 39, 0.5);
+  padding: 24px;
+}
+
+@media (max-width: 560px) {
+  .modalOverlay {
+    padding: 12px;
+  }
+
+  .modal {
+    max-height: 92vh;
+  }
+}
+
+.modal {
+  width: 100%;
+  max-width: 560px;
+  max-height: 84vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(17, 24, 39, 0.2);
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.modalClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.modalClose:hover {
+  background: #f3f4f6;
+}
+
+.modalBody {
+  padding: 16px 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mrInput,
+.mrTextarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #111827;
+  background: #fff;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+
+.mrInput:focus,
+.mrTextarea:focus {
+  border-color: #534ab7;
+  box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.12);
+}
+
+.mrTextarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.mrPreviewHeader {
+  padding-top: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.mrPreview {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 140px;
+  max-height: 220px;
+}
+
+.mrPreview .mrPreviewHeight {
+  overflow: auto;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 18px;
+  border-top: 1px solid #e5e7eb;
+  background: #fafafa;
+}
+
+.mrCancelButton {
+  padding: 8px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.mrCancelButton:hover {
+  border-color: #d1d5db;
+}

@@ -1,3 +1,16 @@
+const AVATAR_COLORS = [
+  "#7c3aed",
+  "#059669",
+  "#dc2626",
+  "#d97706",
+  "#2563eb",
+];
+
+export function avatarColor(username: string): string {
+  if (!username) return AVATAR_COLORS[0];
+  return AVATAR_COLORS[username.charCodeAt(0) % AVATAR_COLORS.length];
+}
+
 export function formatRelativeTime(iso: string): string {
   const date = new Date(iso);
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);

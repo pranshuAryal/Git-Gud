@@ -8,6 +8,7 @@ import {
   Param,
   Query,
   UseGuards,
+  HttpCode,
 } from '@nestjs/common';
 import { RepoService } from './repo.service';
 import { CreateRepositoryDto } from './dto/create-repository.dto';
@@ -66,6 +67,28 @@ export class RepoController {
     return this.repoService.forkRepository(user.userId, id);
   }
 
+  // ---------- stars ----------
+
+  @Post(':id/star')
+  @HttpCode(201)
+  star(@Param('id') repoId: string, @CurrentUser() user: { userId: string }) {
+    return this.repoService.starRepository(user.userId, repoId);
+  }
+
+  @Delete(':id/star')
+  @HttpCode(200)
+  unstar(@Param('id') repoId: string, @CurrentUser() user: { userId: string }) {
+    return this.repoService.unstarRepository(user.userId, repoId);
+  }
+
+  @Get(':id/starred')
+  checkStarred(
+    @Param('id') repoId: string,
+    @CurrentUser() user: { userId: string },
+  ) {
+    return this.repoService.checkStarred(user.userId, repoId);
+  }
+
   // ---------- sections ----------
 
   @Post(':id/sections')
@@ -115,5 +138,23 @@ export class RepoController {
     @CurrentUser() user: { userId: string },
   ) {
     return this.repoService.saveNote(user.userId, repoId, noteId, dto);
+  }
+
+  @Get(':id/notes/:noteId')
+  getNote(
+    @Param('id') repoId: string,
+    @Param('noteId') noteId: string,
+    @CurrentUser() user: { userId: string },
+  ) {
+    return this.repoService.getNote(user.userId, repoId, noteId);
+  }
+
+  @Get(':id/notes/:noteId/versions')
+  noteVersions(
+    @Param('id') repoId: string,
+    @Param('noteId') noteId: string,
+    @CurrentUser() user: { userId: string },
+  ) {
+    return this.repoService.listNoteVersions(user.userId, repoId, noteId);
   }
 }

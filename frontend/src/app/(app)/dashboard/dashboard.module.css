@@ -2,6 +2,16 @@
   padding: 32px;
 }
 
+@media (max-width: 700px) {
+  .page {
+    padding: 20px 16px;
+  }
+
+  .section {
+    margin-top: 28px;
+  }
+}
+
 .topRow {
   display: flex;
   align-items: center;
@@ -97,13 +107,27 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
+}
+
+@media (max-width: 1500px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .topRow {
+    flex-wrap: wrap;
+  }
+
+  .searchWrapper {
+    flex: 1 1 100%;
   }
 }
 

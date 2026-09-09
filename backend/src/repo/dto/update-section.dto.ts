@@ -1,4 +1,11 @@
-import { IsString, IsOptional, IsInt, IsUUID, MinLength, ValidateIf } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsInt,
+  IsUUID,
+  MinLength,
+  ValidateIf,
+} from 'class-validator';
 
 export class UpdateSectionDto {
   @IsOptional()

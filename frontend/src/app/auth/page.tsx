@@ -52,8 +52,9 @@ export default function AuthPage() {
       }
 
       router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Connection to authentication server failed.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Connection to authentication server failed.";
+      setError(message);
     } finally {
       setLoading(false);
     }

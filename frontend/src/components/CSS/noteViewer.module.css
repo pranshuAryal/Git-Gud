@@ -1,0 +1,39 @@
+.viewer {
+  font-size: 14px;
+  line-height: 1.65;
+  color: #1f2937;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.heading {
+  margin: 20px 0 8px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.heading:first-child {
+  margin-top: 0;
+}
+
+.paragraph {
+  margin: 0 0 8px;
+}
+
+.bullet {
+  margin: 0 0 4px;
+  padding-left: 4px;
+}
+
+.bulletDot {
+  color: #9ca3af;
+  margin-right: 8px;
+}
+
+.empty {
+  font-style: italic;
+  color: #9ca3af;
+  font-size: 13px;
+  margin: 0;
+}
