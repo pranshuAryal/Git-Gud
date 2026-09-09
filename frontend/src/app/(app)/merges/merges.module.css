@@ -1,6 +1,28 @@
 .page {
   padding: 32px;
   max-width: 960px;
+  margin: 0 auto;
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding: 20px 16px;
+  }
+
+  .tabs {
+    width: 100%;
+    display: flex;
+  }
+
+  .tab {
+    flex: 1;
+  }
+
+  .itemMeta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
 }
 
 .pageTitle {
@@ -92,6 +114,7 @@
   padding: 18px 22px;
   background: #fff;
   transition: border-color 0.15s;
+  cursor: pointer;
 }
 
 .item:hover {
@@ -281,139 +304,4 @@
 
 .fullLink:hover {
   text-decoration: underline;
-}
-
-.diff {
-  margin-top: 14px;
-}
-
-.diffLoading {
-  padding: 24px;
-  text-align: center;
-  font-size: 13px;
-  color: #9ca3af;
-}
-
-.diffColumn {
-  min-width: 0;
-}
-
-.diffTitle {
-  margin: 0 0 6px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #9ca3af;
-}
-
-.diffBox {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 14px 16px;
-  background: #fafafa;
-  min-height: 80px;
-}
-
-/* Comments */
-
-.comments {
-  margin-top: 16px;
-  border-top: 1px solid #f3f4f6;
-  padding-top: 14px;
-}
-
-.comment {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.commentAvatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #eef2ff;
-  color: #534ab7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.commentBody {
-  flex: 1;
-  min-width: 0;
-}
-
-.commentMeta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.commentAuthor {
-  font-size: 12px;
-  font-weight: 600;
-  color: #111827;
-}
-
-.commentTime {
-  font-size: 11px;
-  color: #9ca3af;
-}
-
-.commentText {
-  margin: 2px 0 0;
-  font-size: 13px;
-  color: #374151;
-  line-height: 1.5;
-}
-
-.commentInputRow {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.commentInput {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 13px;
-  font-family: inherit;
-  outline: none;
-}
-
-.commentInput:focus {
-  border-color: #534ab7;
-  box-shadow: 0 0 0 2px rgba(83, 74, 183, 0.1);
-}
-
-.commentButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 8px;
-  background: #534ab7;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  white-space: nowrap;
-}
-
-.commentButton:hover:not(:disabled) {
-  background: #463da0;
-}
-
-.commentButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }

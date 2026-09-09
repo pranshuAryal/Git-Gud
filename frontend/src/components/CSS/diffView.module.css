@@ -21,10 +21,23 @@
 
 .header span {
   padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .header span + span {
   border-left: 1px solid #e5e7eb;
+}
+
+.headerOriginal {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.headerProposed {
+  background: #ecfdf5;
+  color: #16a34a;
 }
 
 .scroll {
@@ -39,7 +52,7 @@
 
 .cell {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   padding: 3px 14px;
   font-size: 13px;
   line-height: 1.6;
@@ -50,6 +63,21 @@
 
 .row .cell + .cell {
   border-left: 1px solid #e5e7eb;
+}
+
+.sign {
+  flex-shrink: 0;
+  width: 12px;
+  font-weight: 700;
+  user-select: none;
+}
+
+.signMinus {
+  color: #b91c1c;
+}
+
+.signPlus {
+  color: #047857;
 }
 
 .lineNum {

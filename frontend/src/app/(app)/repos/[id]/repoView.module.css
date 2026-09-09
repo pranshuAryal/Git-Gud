@@ -190,6 +190,54 @@
   align-items: start;
 }
 
+@media (max-width: 1100px) {
+  .contentArea {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .notePanel {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding: 16px;
+  }
+
+  .contentArea {
+    grid-template-columns: 1fr;
+  }
+
+  .notePanel {
+    grid-column: 1;
+    grid-row: auto;
+    order: 1;
+  }
+
+  .treePanel {
+    order: 2;
+  }
+
+  .aboutPanel {
+    order: 3;
+  }
+
+  .repoHeader {
+    flex-wrap: wrap;
+  }
+
+  .repoTitle {
+    font-size: 22px;
+  }
+
+  .noteHeader {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
 /* ---- Panels ---- */
 
 .aboutPanel,
@@ -449,6 +497,16 @@
   justify-content: center;
   background: rgba(17, 24, 39, 0.5);
   padding: 24px;
+}
+
+@media (max-width: 560px) {
+  .modalOverlay {
+    padding: 12px;
+  }
+
+  .modal {
+    max-height: 90vh;
+  }
 }
 
 .modal {

@@ -145,6 +145,55 @@
   align-items: start;
 }
 
+@media (max-width: 1150px) {
+  .contentArea {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .editorPanel {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding: 16px;
+  }
+
+  .contentArea {
+    grid-template-columns: 1fr;
+  }
+
+  .editorPanel {
+    grid-column: 1;
+    grid-row: auto;
+    order: 1;
+  }
+
+  .treePanel {
+    order: 2;
+  }
+
+  .sidePanel {
+    order: 3;
+  }
+
+  .repoHeader {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .repoTitle {
+    font-size: 20px;
+  }
+
+  .editorHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 .treePanel,
 .editorPanel,
 .sidePanel {
@@ -304,6 +353,27 @@
   max-width: 260px;
 }
 
+.createNoteButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  padding: 7px 12px;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  color: #534ab7;
+  font-size: 12.5px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.createNoteButton:hover {
+  border-color: #534ab7;
+  background: #f0eefb;
+}
+
 /* ---- Version history ---- */
 
 .versionsBody {
@@ -436,6 +506,16 @@
   justify-content: center;
   background: rgba(17, 24, 39, 0.5);
   padding: 24px;
+}
+
+@media (max-width: 560px) {
+  .modalOverlay {
+    padding: 12px;
+  }
+
+  .modal {
+    max-height: 92vh;
+  }
 }
 
 .modal {

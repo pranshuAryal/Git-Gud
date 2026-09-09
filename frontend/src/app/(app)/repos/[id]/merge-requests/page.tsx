@@ -107,7 +107,7 @@ export default function RepoMergeRequestsPage() {
         {requests.map((mr) => (
           <Link
             key={mr.id}
-            href={`/repos/${id}/merge-requests/${mr.id}`}
+            href={`/merge-requests/${mr.id}`}
             className={styles.item}
           >
             <div className={styles.itemHeader}>

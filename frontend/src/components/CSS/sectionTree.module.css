@@ -75,13 +75,41 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  padding-right: 6px;
+  padding-right: 2px;
   opacity: 0;
   transition: opacity 0.1s;
 }
 
 .row:hover .actions {
   opacity: 1;
+}
+
+.chevronButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.chevronButton:hover {
+  background: #f1f5f9;
+  color: #111827;
+}
+
+.chevronIcon {
+  transition: transform 0.15s ease;
+}
+
+.chevronCollapsed {
+  transform: rotate(-90deg);
 }
 
 .actionButton {

@@ -282,7 +282,7 @@ export default function RepoViewPage() {
                 {openMergeRequests.map((mr) => (
                   <li key={mr.id}>
                     <Link
-                      href={`/repos/${repo.id}/merge-requests/${mr.id}`}
+                      href={`/merge-requests/${mr.id}`}
                       className={styles.mrLink}
                       title={mr.description || mr.title}
                     >
@@ -298,31 +298,26 @@ export default function RepoViewPage() {
 
         {/* Center: Note */}
         <div className={styles.notePanel}>
-          {selectedSection ? (
-            selectedNote ? (
-              <>
-                <div className={styles.noteHeader}>
-                  <span className={styles.noteSectionLabel}>{selectedSection.title}</span>
-                  <button onClick={openHistory} className={styles.historyButton}>
-                    <History size={13} /> History
-                  </button>
-                </div>
-                <div className={styles.noteContent}>
-                  <NoteEditor content={selectedNote.content} editable={false} />
-                </div>
-              </>
-            ) : (
-              <div className={styles.emptyNote}>
-                <FileText size={28} className={styles.emptyNoteIcon} />
-                <p className={styles.emptyNoteText}>Select a section to view its note.</p>
+          {selectedNote ? (
+            <>
+              <div className={styles.noteHeader}>
+                <span className={styles.noteSectionLabel}>{selectedSection?.title}</span>
+                <button onClick={openHistory} className={styles.historyButton}>
+                  <History size={13} /> History
+                </button>
               </div>
-            )
+              <div className={styles.noteContent}>
+                <NoteEditor content={selectedNote.content} editable={false} />
+              </div>
+            </>
           ) : (
             <div className={styles.emptyNote}>
               <FileText size={28} className={styles.emptyNoteIcon} />
               <p className={styles.emptyNoteText}>
                 {repo.sections.length > 0
-                  ? 'Select a section from the tree to view its note.'
+                  ? selectedSection
+                    ? 'This section has no note yet.'
+                    : 'Browse the tree to view notes.'
                   : 'This repository has no content yet.'}
               </p>
             </div>

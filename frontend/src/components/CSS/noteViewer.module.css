@@ -2,6 +2,8 @@
   font-size: 14px;
   line-height: 1.65;
   color: #1f2937;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .heading {

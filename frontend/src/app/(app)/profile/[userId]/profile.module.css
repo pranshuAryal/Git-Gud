@@ -56,9 +56,20 @@
   margin-bottom: 32px;
 }
 
+@media (max-width: 1200px) {
+  .statsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 720px) {
   .statsGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .profileHeader {
+    flex-wrap: wrap;
+    gap: 14px;
   }
 }
 

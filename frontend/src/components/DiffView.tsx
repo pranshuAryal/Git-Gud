@@ -1,5 +1,6 @@
 "use client";
 
+import { X, Check } from "lucide-react";
 import type { FlatDiffRow } from "@/lib/mergeRequests";
 import styles from "./CSS/diffView.module.css";
 
@@ -87,8 +88,12 @@ export function DiffView({
     <div className={styles.wrap}>
       {showHeader && (
         <div className={styles.header}>
-          <span>Original</span>
-          <span>Proposed</span>
+          <span className={styles.headerOriginal}>
+            <X size={13} /> Original
+          </span>
+          <span className={styles.headerProposed}>
+            <Check size={13} /> Proposed
+          </span>
         </div>
       )}
       <div className={styles.scroll}>
@@ -106,13 +111,21 @@ export function DiffView({
               : line.kind === "add" || line.kind === "modify"
                 ? styles.add
                 : styles.muted;
+          const leftRemoved = line.kind === "remove" || line.kind === "modify";
+          const rightAdded = line.kind === "add" || line.kind === "modify";
           return (
             <div key={key} className={styles.row}>
               <div className={`${styles.cell} ${leftClass}`}>
+                {leftRemoved && (
+                  <span className={`${styles.sign} ${styles.signMinus}`}>-</span>
+                )}
                 <span className={styles.lineNum}>{line.leftNum ?? ""}</span>
                 <span className={styles.lineText}>{line.left}</span>
               </div>
               <div className={`${styles.cell} ${rightClass}`}>
+                {rightAdded && (
+                  <span className={`${styles.sign} ${styles.signPlus}`}>+</span>
+                )}
                 <span className={styles.lineNum}>{line.rightNum ?? ""}</span>
                 <span className={styles.lineText}>{line.right}</span>
               </div>

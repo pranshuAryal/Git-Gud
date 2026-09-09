@@ -8,17 +8,11 @@ import { useAuth } from "@/app/context/AuthContext";
 
 export default function SidePanel() {
   const pathname = usePathname();
-  const { isSidebarOpen, closeSidebar } = useLayout();
+  const { closeSidebar } = useLayout();
   const { user } = useAuth();
 
-  const isDashboard = pathname === "/dashboard" || pathname === "/";
-
   // Build structural classes based on route location and sidebar drawer state
-  const sidebarClassName = `
-    ${styles.sidebar} 
-    ${isDashboard ? styles.dashboardDocked : styles.repositoryDrawer} 
-    ${(!isDashboard && isSidebarOpen) ? styles.drawerOpen : ""}
-  `.trim();
+  const sidebarClassName = `${styles.sidebar} ${styles.dashboardDocked}`.trim();
 
   const navItems = [
     { label: "Dashboard", href: "/dashboard", icon: "M4 4h6v8H4zm10 0h6v5h-6zm0 9h6v7h-6zm-10 4h6v3H4z" },
@@ -84,9 +78,9 @@ export default function SidePanel() {
         <div className={styles.section}>
           <h4 className={styles.sectionTitle}>ACCOUNT</h4>
           <Link
-            href={user?.userId ? `/profile/${user.userId}` : "/profile"}
+            href="/settings"
             onClick={closeSidebar}
-            className={`${styles.navLink} ${pathname?.startsWith("/profile") ? styles.activeLink : ""}`}
+            className={`${styles.navLink} ${pathname?.startsWith("/profile") || pathname?.startsWith("/settings") ? styles.activeLink : ""}`}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />

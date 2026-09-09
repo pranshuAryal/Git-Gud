@@ -4,15 +4,9 @@ import Link from "next/link";
 import styles from "./CSS/navbar.module.css";
 import { useState } from "react";
 import OverlayCard from "@/components/OverlayCard";
-import { usePathname } from "next/navigation";
-import { useLayout } from "@/app/context/LayoutContext";
 
 export default function Navbar() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const pathname = usePathname();
-  const { toggleSidebar } = useLayout();
-
-  const isDashboard = pathname === "/dashboard" || pathname === "/";
   const handleLogoutConfirm = async () => {
     try {
       console.log("reached here");
@@ -37,27 +31,6 @@ export default function Navbar() {
     <>
       <header className={styles.navbar}>
         <div className={styles.leftContainer}>
-          {/* Hamburger Menu Icon — Automatically hidden on the main dashboard */}
-          {!isDashboard && (
-            <button
-              onClick={toggleSidebar}
-              className={styles.hamburgerButton}
-              aria-label="Toggle Side Panel"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-              >
-                <line x1="3" y1="12" x2="21" y2="12" strokeLinecap="round" />
-                <line x1="3" y1="6" x2="21" y2="6" strokeLinecap="round" />
-                <line x1="3" y1="18" x2="21" y2="18" strokeLinecap="round" />
-              </svg>
-            </button>
-          )}
           {/* Left Side: Brand Logo & Name */}
           <Link href="/" className={styles.brandLink}>
             <div className={styles.logoIcon}>

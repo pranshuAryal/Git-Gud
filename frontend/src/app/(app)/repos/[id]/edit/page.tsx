@@ -10,6 +10,7 @@ import {
   CheckCircle,
   Eye,
   Pencil,
+  Plus,
   X,
 } from 'lucide-react';
 import { fetchRepository, RepositoryDetail, createSection, deleteSection, createNote } from '@/lib/api';
@@ -183,7 +184,7 @@ export default function RepoEditPage() {
         description: mrDescription.trim() || undefined,
         content: workingContent,
       });
-      setMrResultUrl(`/repos/${result.repo.id}/merge-requests/${result.id}`);
+      setMrResultUrl(`/merge-requests/${result.id}`);
       setMrOpen(false);
       setMrTitle('');
       setMrDescription('');
@@ -318,13 +319,25 @@ export default function RepoEditPage() {
                 />
               </div>
             </>
+          ) : selectedSection ? (
+            <div className={styles.emptyNote}>
+              <FileText size={28} className={styles.emptyNoteIcon} />
+              <p className={styles.emptyNoteText}>
+                This section doesn&apos;t have a note yet.
+              </p>
+              <button
+                type="button"
+                className={styles.createNoteButton}
+                onClick={() => handleCreateNote(selectedSection.id)}
+              >
+                <Plus size={12} /> Create Note
+              </button>
+            </div>
           ) : (
             <div className={styles.emptyNote}>
               <FileText size={28} className={styles.emptyNoteIcon} />
               <p className={styles.emptyNoteText}>
-                {repo.sections.length > 0
-                  ? 'Select a section to edit its note.'
-                  : 'Add sections to start building your repository.'}
+                Add sections to start building your repository.
               </p>
             </div>
           )}
