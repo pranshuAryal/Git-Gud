@@ -9,7 +9,6 @@ export default function Navbar() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const handleLogoutConfirm = async () => {
     try {
-      console.log("reached here");
       const response = await fetch("http://localhost:4000/auth/logout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
