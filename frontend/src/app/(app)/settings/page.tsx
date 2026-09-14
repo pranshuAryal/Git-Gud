@@ -10,7 +10,6 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Star,
-  FolderOpen,
   AlertTriangle,
   Save,
 } from "lucide-react";
@@ -21,7 +20,6 @@ import {
   changePassword,
   type ProfileData,
 } from "@/lib/api";
-import { RepoCard } from "@/components/RepoCard";
 import { formatRelativeTime } from "@/lib/format";
 import styles from "./settings.module.css";
 import profileStyles from "@/app/(app)/profile/[userId]/profile.module.css";
@@ -354,13 +352,13 @@ function ProfileEditor({
         </div>
       </section>
 
-      {/* Card 2: Account Credentials & Repositories */}
+      {/* Card 2: Account Credentials */}
       <section className={styles.card}>
         <div className={styles.cardHeader}>
           <div>
-            <h2 className={styles.cardTitle}>Account Credentials &amp; Repositories</h2>
+            <h2 className={styles.cardTitle}>Account Credentials</h2>
             <p className={styles.cardSubtitle}>
-              Update login passwords and manage connected repository ownership
+              Update login passwords and manage your account security
             </p>
           </div>
         </div>
@@ -428,54 +426,6 @@ function ProfileEditor({
 
         <hr className={styles.divider} />
 
-        <div className={styles.headerLine}>
-          <h3 className={styles.subheading}>Connected Repositories Summary</h3>
-          <span className={styles.mutedRight}>
-            {data.counts.repositories} total owned{" "}
-            {data.counts.repositories === 1 ? "repository" : "repositories"}
-          </span>
-        </div>
-        {data.repositories.length === 0 ? (
-          <div className={pageStyles.emptyState}>No repositories yet.</div>
-        ) : (
-          <div className={styles.repoList}>
-            {data.repositories.map((repo) => {
-              const repoIcon = repo.forkedFrom ? (
-                <GitFork size={16} />
-              ) : repo.isPublic ? (
-                <FolderOpen size={16} />
-              ) : (
-                <Lock size={16} />
-              );
-              const isPrivate = !repo.isPublic;
-              const sub = isPrivate
-                ? "Only you can view"
-                : `Updated ${formatRelativeTime(repo.updatedAt)} • ${repo._count.stars} ${
-                    repo._count.stars === 1 ? "star" : "stars"
-                  }`;
-              return (
-                <div key={repo.id} className={styles.repoRow}>
-                  <div className={styles.repoIcon}>{repoIcon}</div>
-                  <div className={styles.repoInfo}>
-                    <p className={styles.repoName}>{repo.name}</p>
-                    <p className={styles.repoSub}>{sub}</p>
-                  </div>
-                  <span
-                    className={`${styles.statusPill} ${
-                      isPrivate ? styles.statusPrivate : styles.statusPublic
-                    }`}
-                  >
-                    {isPrivate && <Lock size={11} />}
-                    {isPrivate ? "Private" : "Public"}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        <hr className={styles.divider} />
-
         <div className={styles.dangerCard}>
           <div className={styles.dangerIconBox}>
             <AlertTriangle size={18} />
@@ -489,23 +439,6 @@ function ProfileEditor({
           </div>
           <button className={styles.dangerButton}>Delete account</button>
         </div>
-      </section>
-
-      {/* Card 3: Your repositories (from profile page) */}
-      <section className={styles.card}>
-        <div className={styles.headerLine}>
-          <h3 className={styles.cardTitle}>Your repositories</h3>
-          <span className={styles.mutedRight}>{data.counts.repositories} total</span>
-        </div>
-        {data.repositories.length === 0 ? (
-          <div className={pageStyles.emptyState}>No repositories yet.</div>
-        ) : (
-          <div className={`${pageStyles.grid} ${styles.reposGrid}`} style={{ marginTop: 14 }}>
-            {data.repositories.map((repo) => (
-              <RepoCard key={repo.id} repo={repo} />
-            ))}
-          </div>
-        )}
       </section>
 
       {(dirty || saveNote) && (
