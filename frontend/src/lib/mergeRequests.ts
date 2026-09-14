@@ -11,7 +11,7 @@ export interface MergeRequestData {
   id: string;
   title: string;
   description: string | null;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | "cancelled";
   feedback: string | null;
   createdAt: string;
   submittedBy: string;
@@ -73,6 +73,12 @@ export function updateMergeRequestStatus(
   return apiFetch(`/merge-requests/${id}`, {
     method: "PATCH",
     body: JSON.stringify(payload),
+  });
+}
+
+export function cancelMergeRequest(id: string) {
+  return apiFetch(`/merge-requests/${id}/cancel`, {
+    method: "PATCH",
   });
 }
 

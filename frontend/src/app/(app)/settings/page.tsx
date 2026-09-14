@@ -15,7 +15,12 @@ import {
   Save,
 } from "lucide-react";
 import { useAuth } from "@/app/context/AuthContext";
-import { fetchProfile, type ProfileData } from "@/lib/api";
+import {
+  fetchProfile,
+  updateProfile,
+  changePassword,
+  type ProfileData,
+} from "@/lib/api";
 import { RepoCard } from "@/components/RepoCard";
 import { formatRelativeTime } from "@/lib/format";
 import styles from "./settings.module.css";
@@ -28,7 +33,7 @@ const DEFAULT_BIO =
 const INPUT_CLASSES = `${styles.input} ${styles.inputPillPadding}`;
 
 export default function SettingsProfilePage() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const userId = user?.userId;
 
   const [data, setData] = useState<ProfileData | null>(null);
@@ -69,22 +74,26 @@ export default function SettingsProfilePage() {
     );
   }
 
-  return <ProfileEditor data={data} email={user.email} />;
+  return <ProfileEditor data={data} email={user.email} userId={user.userId} refreshUser={refreshUser} />;
 }
 
 function ProfileEditor({
   data,
   email,
+  userId,
+  refreshUser,
 }: {
   data: ProfileData;
   email: string;
+  userId: string;
+  refreshUser: () => Promise<void>;
 }) {
   const profile = data.profile;
   const INITIAL = {
     username: profile.username,
-    displayName: profile.username,
+    displayName: profile.name ?? profile.username,
     email,
-    bio: DEFAULT_BIO,
+    bio: profile.bio ?? DEFAULT_BIO,
   };
 
   const [username, setUsername] = useState(INITIAL.username);
@@ -97,6 +106,11 @@ function ProfileEditor({
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordNote, setPasswordNote] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState(false);
+  const [updatingPassword, setUpdatingPassword] = useState(false);
+  const [saveNote, setSaveNote] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const dirty =
     username !== committed.username ||
@@ -104,12 +118,32 @@ function ProfileEditor({
     emailValue !== committed.email ||
     bio !== committed.bio;
 
-  const handleSave = () => {
-    setCommitted({ username, displayName, email: emailValue, bio });
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-    setPasswordNote(null);
+  const handleSave = async () => {
+    if (saving) return;
+    setSaveNote(null);
+    setSaveError(false);
+    setSaving(true);
+    try {
+      const updated = await updateProfile(userId, {
+        username,
+        name: displayName,
+        bio,
+      });
+      const p = updated.profile;
+      setCommitted({
+        username: p.username,
+        displayName: p.name ?? p.username,
+        email,
+        bio: p.bio ?? "",
+      });
+      setSaveNote("Profile saved successfully.");
+      await refreshUser();
+    } catch (err) {
+      setSaveError(true);
+      setSaveNote(err instanceof Error ? err.message : "Failed to save profile");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleReset = () => {
@@ -121,10 +155,34 @@ function ProfileEditor({
     setNewPassword("");
     setConfirmPassword("");
     setPasswordNote(null);
+    setSaveNote(null);
+    setSaveError(false);
   };
 
-  const handleUpdatePassword = () => {
-    setPasswordNote("Password updated successfully.");
+  const handleUpdatePassword = async () => {
+    if (updatingPassword) return;
+    setPasswordNote(null);
+    if (newPassword !== confirmPassword) {
+      setPasswordError(true);
+      setPasswordNote("Passwords do not match.");
+      return;
+    }
+    setUpdatingPassword(true);
+    setPasswordError(false);
+    try {
+      await changePassword({ currentPassword, newPassword });
+      setPasswordNote("Password updated successfully.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      setPasswordError(true);
+      setPasswordNote(
+        err instanceof Error ? err.message : "Failed to update password",
+      );
+    } finally {
+      setUpdatingPassword(false);
+    }
   };
 
   const initials = profile.username.slice(0, 2).toUpperCase();
@@ -234,7 +292,8 @@ function ProfileEditor({
               id="email"
               className={INPUT_CLASSES}
               value={emailValue}
-              onChange={(e) => setEmailValue(e.target.value)}
+              readOnly
+              aria-readonly="true"
             />
             <span className={styles.verifiedPill}>
               <CheckCircle size={12} />
@@ -354,11 +413,15 @@ function ProfileEditor({
           className={styles.secondaryButton}
           style={{ marginTop: 14 }}
           onClick={handleUpdatePassword}
+          disabled={updatingPassword}
         >
-          Update Password
+          {updatingPassword ? "Updating..." : "Update Password"}
         </button>
         {passwordNote && (
-          <p className={styles.helper} style={{ marginTop: 10, color: "#059669" }}>
+          <p
+            className={styles.helper}
+            style={{ marginTop: 10, color: passwordError ? "#dc2626" : "#059669" }}
+          >
             {passwordNote}
           </p>
         )}
@@ -445,19 +508,34 @@ function ProfileEditor({
         )}
       </section>
 
-      {dirty && (
+      {(dirty || saveNote) && (
         <div className={styles.saveBar} role="status">
           <div className={styles.warningText}>
             <span className={styles.warningDot} />
-            <span>Careful — you have unsaved changes in Profile and Notifications</span>
+            <span
+              style={
+                saveNote && saveError
+                  ? { color: "#dc2626" }
+                  : saveNote
+                    ? { color: "#059669" }
+                    : undefined
+              }
+            >
+              {saveNote ||
+                "Careful — you have unsaved changes in Profile and Notifications"}
+            </span>
           </div>
           <div className={styles.saveActions}>
             <button className={styles.resetTextButton} onClick={handleReset}>
               Reset
             </button>
-            <button className={styles.primaryButton} onClick={handleSave}>
+            <button
+              className={styles.primaryButton}
+              onClick={handleSave}
+              disabled={saving}
+            >
               <Save size={14} />
-              Save changes
+              {saving ? "Saving..." : "Save changes"}
             </button>
           </div>
         </div>

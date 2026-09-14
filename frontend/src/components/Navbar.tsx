@@ -23,7 +23,7 @@ export default function Navbar() {
       }
     } catch (error) {
       console.error("Logout error:", error);
-    }
+    } 
   };
 
   return (

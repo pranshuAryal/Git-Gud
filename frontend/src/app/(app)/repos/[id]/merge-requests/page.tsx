@@ -21,12 +21,14 @@ const STATUS_BADGE: Record<string, string> = {
   pending: styles.statusPending,
   approved: styles.statusApproved,
   rejected: styles.statusRejected,
+  cancelled: styles.statusCancelled,
 };
 
 const STATUS_LABEL: Record<string, string> = {
   pending: 'Pending',
   approved: 'Approved',
   rejected: 'Rejected',
+  cancelled: 'Cancelled',
 };
 
 export default function RepoMergeRequestsPage() {

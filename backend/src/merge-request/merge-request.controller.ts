@@ -49,6 +49,11 @@ export class MergeRequestController {
     return this.mergeRequestService.findMergeRequest(user.userId, id);
   }
 
+  @Patch(':id/cancel')
+  cancel(@Param('id') id: string, @CurrentUser() user: { userId: string }) {
+    return this.mergeRequestService.cancelMergeRequest(user.userId, id);
+  }
+
   @Patch(':id')
   updateStatus(
     @Param('id') id: string,

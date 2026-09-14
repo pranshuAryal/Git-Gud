@@ -206,6 +206,30 @@ export class MergeRequestService {
     });
   }
 
+  async cancelMergeRequest(userId: string, mrId: string) {
+    const mr = await this.prisma.mergeRequest.findUnique({
+      where: { id: mrId },
+      select: { id: true, submittedBy: true, status: true },
+    });
+    if (!mr) throw new NotFoundException('Merge request not found');
+    if (mr.submittedBy !== userId) {
+      throw new ForbiddenException(
+        'Only the submitter can cancel this merge request',
+      );
+    }
+    if (mr.status !== 'pending') {
+      throw new BadRequestException(
+        'This merge request has already been resolved',
+      );
+    }
+
+    return this.prisma.mergeRequest.update({
+      where: { id: mrId },
+      data: { status: MergeRequestStatus.CANCELLED },
+      include: MR_INCLUDE,
+    });
+  }
+
   async addComment(userId: string, mrId: string, dto: CreateCommentDto) {
     const mr = await this.prisma.mergeRequest.findUnique({
       where: { id: mrId },
