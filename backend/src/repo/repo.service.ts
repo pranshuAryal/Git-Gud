@@ -15,6 +15,7 @@ import {
 import { CreateSectionDto } from './dto/create-section.dto';
 import { UpdateSectionDto } from './dto/update-section.dto';
 import { SaveNoteDto } from './dto/save-note.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 const CARD_SELECT = {
   id: true,
@@ -471,7 +472,13 @@ export class RepoService {
   async getUserProfile(viewerId: string, userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, username: true, createdAt: true },
+      select: {
+        id: true,
+        username: true,
+        name: true,
+        bio: true,
+        createdAt: true,
+      },
     });
     if (!user) throw new NotFoundException('User not found');
 
@@ -530,6 +537,8 @@ export class RepoService {
       profile: {
         id: user.id,
         username: user.username,
+        name: user.name,
+        bio: user.bio,
         createdAt: user.createdAt,
       },
       isSelf,
@@ -542,6 +551,51 @@ export class RepoService {
       },
       repositories: publicRepos,
     };
+  }
+
+  async updateUserProfile(
+    viewerId: string,
+    userId: string,
+    dto: UpdateProfileDto,
+  ) {
+    if (viewerId !== userId) {
+      throw new ForbiddenException('You can only update your own profile');
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    if (dto.username && dto.username !== user.username) {
+      const existing = await this.prisma.user.findFirst({
+        where: { username: dto.username },
+      });
+      if (existing) {
+        throw new ConflictException(
+          'An account with this username already exists',
+        );
+      }
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(dto.username !== undefined && { username: dto.username }),
+        ...(dto.name !== undefined && { name: dto.name }),
+        ...(dto.bio !== undefined && { bio: dto.bio }),
+      },
+      select: {
+        id: true,
+        username: true,
+        name: true,
+        bio: true,
+        email: true,
+        createdAt: true,
+      },
+    });
+
+    return { profile: updated };
   }
 
   // ================= PRIVATE HELPERS =================

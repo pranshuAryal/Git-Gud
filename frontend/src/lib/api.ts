@@ -10,6 +10,16 @@ export function fetchMe(): Promise<AuthUser> {
   return apiFetch<AuthUser>("/auth/me");
 }
 
+export function changePassword(payload: {
+  currentPassword: string;
+  newPassword: string;
+}): Promise<{ success: boolean }> {
+  return apiFetch("/auth/change-password", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
 export interface RepoCardData {
   id: string;
   name: string;
@@ -131,7 +141,7 @@ export function createNote(repoId: string, sectionId: string) {
 }
 
 export interface ProfileData {
-  profile: { id: string; username: string; createdAt: string };
+  profile: { id: string; username: string; name: string | null; bio: string | null; createdAt: string };
   isSelf: boolean;
   counts: {
     repositories: number;
@@ -145,4 +155,14 @@ export interface ProfileData {
 
 export function fetchProfile(userId: string): Promise<ProfileData> {
   return apiFetch(`/profiles/${userId}`);
+}
+
+export function updateProfile(
+  userId: string,
+  payload: { username?: string; name?: string; bio?: string },
+): Promise<{ profile: ProfileData["profile"] }> {
+  return apiFetch(`/profiles/${userId}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
 }

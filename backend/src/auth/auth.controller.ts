@@ -10,7 +10,7 @@ import {
 import type { Response } from 'express';
 
 import { AuthService } from './auth.service';
-import { SignupDto, LoginDto } from './dto/auth.dto';
+import { SignupDto, LoginDto, ChangePasswordDto } from './dto/auth.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
@@ -48,6 +48,16 @@ export class AuthController {
     return { user };
   }
 
+  @Post('change-password')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  changePassword(
+    @Body() dto: ChangePasswordDto,
+    @CurrentUser() user: { userId: string },
+  ) {
+    return this.authService.changePassword(user.userId, dto);
+  }
+
   @Post('logout')
   @HttpCode(200)
   logout(@Res({ passthrough: true }) res: Response) {
@@ -57,7 +67,7 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  me(@CurrentUser() user: { userId: string; email: string; username: string }) {
-    return user;
+  me(@CurrentUser() user: { userId: string }) {
+    return this.authService.getMe(user.userId);
   }
 }

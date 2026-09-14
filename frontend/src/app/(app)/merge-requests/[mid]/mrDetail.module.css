@@ -152,6 +152,11 @@
   color: #dc2626;
 }
 
+.statusCancelled {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
 .byLine {
   display: inline-flex;
   align-items: center;

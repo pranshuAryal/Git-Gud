@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { GitMerge, X, Check, Send } from 'lucide-react';
+import { GitMerge, X, Check, Send, Ban } from 'lucide-react';
 import {
   fetchMergeRequest,
   updateMergeRequestStatus,
   addMergeRequestComment,
+  cancelMergeRequest,
   MergeRequestData,
 } from '@/lib/mergeRequests';
 import { useAuth } from '@/app/context/AuthContext';
@@ -19,12 +20,14 @@ const STATUS_BADGE: Record<string, string> = {
   pending: styles.statusPending,
   approved: styles.statusApproved,
   rejected: styles.statusRejected,
+  cancelled: styles.statusCancelled,
 };
 
 const STATUS_LABEL: Record<string, string> = {
   pending: 'Pending',
   approved: 'Approved',
   rejected: 'Rejected',
+  cancelled: 'Cancelled',
 };
 
 export default function MergeRequestDetailPage() {
@@ -59,6 +62,8 @@ export default function MergeRequestDetailPage() {
 
   const isOwner = user && mr && mr.repo.ownerId === user.userId;
 
+  const isSubmitter = user && mr && mr.submittedBy === user.userId;
+
   const handleStatus = async (status: 'approved' | 'rejected') => {
     const feedback =
       status === 'rejected'
@@ -69,6 +74,15 @@ export default function MergeRequestDetailPage() {
       setReloadKey((k) => k + 1);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to update request');
+    }
+  };
+
+  const handleCancel = async () => {
+    try {
+      await cancelMergeRequest(mid);
+      setReloadKey((k) => k + 1);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to cancel request');
     }
   };
 
@@ -125,20 +139,32 @@ export default function MergeRequestDetailPage() {
           {mr.title}
         </h1>
 
-        {mr.status === 'pending' && isOwner && (
+        {mr.status === 'pending' && (isOwner || isSubmitter) && (
           <div className={styles.headerActions}>
-            <button
-              onClick={() => handleStatus('rejected')}
-              className={`${styles.actionButton} ${styles.rejectAction}`}
-            >
-              <X size={14} /> Reject
-            </button>
-            <button
-              onClick={() => handleStatus('approved')}
-              className={`${styles.actionButton} ${styles.approveAction}`}
-            >
-              <Check size={14} /> Approve &amp; merge
-            </button>
+            {isOwner && (
+              <>
+                <button
+                  onClick={() => handleStatus('rejected')}
+                  className={`${styles.actionButton} ${styles.rejectAction}`}
+                >
+                  <X size={14} /> Reject
+                </button>
+                <button
+                  onClick={() => handleStatus('approved')}
+                  className={`${styles.actionButton} ${styles.approveAction}`}
+                >
+                  <Check size={14} /> Approve &amp; merge
+                </button>
+              </>
+            )}
+            {isSubmitter && (
+              <button
+                onClick={handleCancel}
+                className={`${styles.actionButton} ${styles.cancelAction}`}
+              >
+                <Ban size={14} /> Cancel request
+              </button>
+            )}
           </div>
         )}
       </div>

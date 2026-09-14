@@ -9,8 +9,9 @@ export enum RepoScope {
 }
 
 export class ListRepositoriesQueryDto {
+  @IsOptional()
   @IsEnum(RepoScope)
-  scope: RepoScope;
+  scope: RepoScope = RepoScope.OWNED;
 
   @IsOptional()
   @IsString()
