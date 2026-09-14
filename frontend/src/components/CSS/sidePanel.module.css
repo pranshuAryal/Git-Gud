@@ -47,19 +47,6 @@
   transform: none !important;
 }
 
-/* Repository mode: Absolute overlay drawer style setup */
-.repositoryDrawer {
-  position: fixed;
-  left: 0;
-  z-index: 90;
-  transform: translateX(-100%);
-  box-shadow: 5px 0 25px rgba(0, 0, 0, 0.05);
-}
-
-.drawerOpen {
-  transform: translateX(0);
-}
-
 .scrollContainer {
   padding: 16px 8px;
   display: flex;

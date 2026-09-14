@@ -1,4 +1,3 @@
-// backend/src/common/jwt.util.ts
 import * as jwt from 'jsonwebtoken';
 import { UserRecord } from 'src/types/auth';
 

@@ -162,11 +162,6 @@
   color: #dc2626;
 }
 
-.statusCancelled {
-  background: #f3f4f6;
-  color: #6b7280;
-}
-
 .statusActions {
   display: flex;
   gap: 8px;
@@ -208,16 +203,6 @@
 
 .rejectAction:hover {
   background: #fee2e2;
-}
-
-.cancelAction {
-  background: #f3f4f6;
-  border-color: #d1d5db;
-  color: #6b7280;
-}
-
-.cancelAction:hover {
-  background: #e5e7eb;
 }
 
 .itemMeta {
