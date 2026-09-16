@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Eye,
   Lock,
@@ -11,7 +11,6 @@ import {
   ArrowDownRight,
   Star,
   AlertTriangle,
-  Save,
 } from "lucide-react";
 import { useAuth } from "@/app/context/AuthContext";
 import {
@@ -90,13 +89,11 @@ function ProfileEditor({
   const INITIAL = {
     username: profile.username,
     displayName: profile.name ?? profile.username,
-    email,
     bio: profile.bio ?? DEFAULT_BIO,
   };
 
   const [username, setUsername] = useState(INITIAL.username);
   const [displayName, setDisplayName] = useState(INITIAL.displayName);
-  const [emailValue, setEmailValue] = useState(INITIAL.email);
   const [bio, setBio] = useState(INITIAL.bio);
   const [committed, setCommitted] = useState(INITIAL);
 
@@ -109,12 +106,24 @@ function ProfileEditor({
   const [saveNote, setSaveNote] = useState<string | null>(null);
   const [saveError, setSaveError] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [hiding, setHiding] = useState(false);
+
+  const dismissBar = useCallback(() => {
+    setHiding(true);
+    window.setTimeout(() => setHiding(false), 200);
+  }, []);
 
   const dirty =
     username !== committed.username ||
     displayName !== committed.displayName ||
-    emailValue !== committed.email ||
     bio !== committed.bio;
+
+  useEffect(() => {
+    if (saveNote && !saveError) {
+      const t = setTimeout(() => setSaveNote(null), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [saveNote, saveError]);
 
   const handleSave = async () => {
     if (saving) return;
@@ -131,10 +140,10 @@ function ProfileEditor({
       setCommitted({
         username: p.username,
         displayName: p.name ?? p.username,
-        email,
         bio: p.bio ?? "",
       });
       setSaveNote("Profile saved successfully.");
+      dismissBar();
       await refreshUser();
     } catch (err) {
       setSaveError(true);
@@ -142,19 +151,6 @@ function ProfileEditor({
     } finally {
       setSaving(false);
     }
-  };
-
-  const handleReset = () => {
-    setUsername(committed.username);
-    setDisplayName(committed.displayName);
-    setEmailValue(committed.email);
-    setBio(committed.bio);
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-    setPasswordNote(null);
-    setSaveNote(null);
-    setSaveError(false);
   };
 
   const handleUpdatePassword = async () => {
@@ -289,7 +285,7 @@ function ProfileEditor({
             <input
               id="email"
               className={INPUT_CLASSES}
-              value={emailValue}
+              value={email}
               readOnly
               aria-readonly="true"
             />
@@ -349,6 +345,24 @@ function ProfileEditor({
               </div>
             ))}
           </div>
+        </div>
+
+        <div style={{ marginTop: 20 }}>
+          <button
+            className={styles.secondaryButton}
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? "Saving..." : "Update Profile"}
+          </button>
+          {saveNote && (
+            <p
+              className={styles.helper}
+              style={{ marginTop: 10, color: saveError ? "#dc2626" : "#059669" }}
+            >
+              {saveNote}
+            </p>
+          )}
         </div>
       </section>
 
@@ -441,35 +455,16 @@ function ProfileEditor({
         </div>
       </section>
 
-      {(dirty || saveNote) && (
-        <div className={styles.saveBar} role="status">
+      {(dirty || hiding) && (
+        <div
+          className={`${styles.saveBar} ${
+            hiding && !dirty ? styles.saveBarLeave : ""
+          }`}
+          role="status"
+        >
           <div className={styles.warningText}>
             <span className={styles.warningDot} />
-            <span
-              style={
-                saveNote && saveError
-                  ? { color: "#dc2626" }
-                  : saveNote
-                    ? { color: "#059669" }
-                    : undefined
-              }
-            >
-              {saveNote ||
-                "Careful — you have unsaved changes in Profile and Notifications"}
-            </span>
-          </div>
-          <div className={styles.saveActions}>
-            <button className={styles.resetTextButton} onClick={handleReset}>
-              Reset
-            </button>
-            <button
-              className={styles.primaryButton}
-              onClick={handleSave}
-              disabled={saving}
-            >
-              <Save size={14} />
-              {saving ? "Saving..." : "Save changes"}
-            </button>
+            <span>Careful — you have unsaved changes in Profile and Notifications</span>
           </div>
         </div>
       )}
