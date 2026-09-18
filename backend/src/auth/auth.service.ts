@@ -17,12 +17,17 @@ export class AuthService {
   async getMe(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, username: true },
+      select: { id: true, email: true, username: true, avatarUrl: true },
     });
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
-    return { userId: user.id, email: user.email, username: user.username };
+    return {
+      userId: user.id,
+      email: user.email,
+      username: user.username,
+      avatarUrl: user.avatarUrl,
+    };
   }
 
   async signup(dto: SignupDto) {

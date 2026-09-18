@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { fetchProfile, ProfileData } from '@/lib/api';
 import { RepoCard } from '@/components/RepoCard';
-import { formatRelativeTime } from '@/lib/format';
+import { formatRelativeTime, avatarSrc } from '@/lib/format';
 import styles from '../../shared/pageStyles.module.css';
 import profileStyles from './profile.module.css';
 import { useAuth } from '@/app/context/AuthContext';
@@ -65,7 +65,15 @@ export default function UserProfilePage() {
     <div className={styles.page}>
       <div className={profileStyles.profileHeader}>
         <div className={profileStyles.avatar}>
-          {profile.username.slice(0, 2).toUpperCase()}
+          {avatarSrc(profile.avatarUrl) ? (
+            <img
+              src={avatarSrc(profile.avatarUrl) ?? undefined}
+              alt={profile.username}
+              className={profileStyles.avatarImg}
+            />
+          ) : (
+            profile.username.slice(0, 2).toUpperCase()
+          )}
         </div>
         <div className={profileStyles.identity}>
           <h1 className={profileStyles.username}>

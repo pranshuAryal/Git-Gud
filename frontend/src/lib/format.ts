@@ -1,3 +1,5 @@
+import { API_URL } from "@/lib/http";
+
 const AVATAR_COLORS = [
   "#7c3aed",
   "#059669",
@@ -9,6 +11,12 @@ const AVATAR_COLORS = [
 export function avatarColor(username: string): string {
   if (!username) return AVATAR_COLORS[0];
   return AVATAR_COLORS[username.charCodeAt(0) % AVATAR_COLORS.length];
+}
+
+export function avatarSrc(url: string | null | undefined): string | null {
+  if (!url) return null;
+  if (/^https?:\/\//.test(url)) return url;
+  return `${API_URL}${url}`;
 }
 
 export function formatRelativeTime(iso: string): string {
