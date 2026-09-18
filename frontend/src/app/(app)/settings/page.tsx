@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Eye,
   Lock,
   CheckCircle,
   Folder,
@@ -11,15 +10,18 @@ import {
   ArrowDownRight,
   Star,
   AlertTriangle,
+  Trash2,
 } from "lucide-react";
 import { useAuth } from "@/app/context/AuthContext";
 import {
   fetchProfile,
   updateProfile,
   changePassword,
+  uploadAvatar,
+  deleteAvatar,
   type ProfileData,
 } from "@/lib/api";
-import { formatRelativeTime } from "@/lib/format";
+import { formatRelativeTime, avatarSrc } from "@/lib/format";
 import styles from "./settings.module.css";
 import profileStyles from "@/app/(app)/profile/[userId]/profile.module.css";
 import pageStyles from "@/app/(app)/shared/pageStyles.module.css";
@@ -107,6 +109,11 @@ function ProfileEditor({
   const [saveError, setSaveError] = useState(false);
   const [saving, setSaving] = useState(false);
   const [hiding, setHiding] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(profile.avatarUrl);
+  const [avatarNote, setAvatarNote] = useState<string | null>(null);
+  const [avatarError, setAvatarError] = useState(false);
+  const [avatarBusy, setAvatarBusy] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const dismissBar = useCallback(() => {
     setHiding(true);
@@ -124,6 +131,65 @@ function ProfileEditor({
       return () => clearTimeout(t);
     }
   }, [saveNote, saveError]);
+
+  useEffect(() => {
+    if (avatarNote) {
+      const t = setTimeout(() => setAvatarNote(null), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [avatarNote]);
+
+  const handleAvatarFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setAvatarError(true);
+      setAvatarNote("Please choose an image file.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError(true);
+      setAvatarNote("Image must be under 5MB.");
+      return;
+    }
+    setAvatarBusy(true);
+    setAvatarNote(null);
+    try {
+      const result = await uploadAvatar(userId, file);
+      setAvatarUrl(result.profile.avatarUrl);
+      setAvatarError(false);
+      setAvatarNote("Profile picture updated.");
+      await refreshUser();
+    } catch (err) {
+      setAvatarError(true);
+      setAvatarNote(
+        err instanceof Error ? err.message : "Failed to upload image",
+      );
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    if (avatarBusy || !avatarUrl) return;
+    setAvatarBusy(true);
+    setAvatarNote(null);
+    try {
+      await deleteAvatar(userId);
+      setAvatarUrl(null);
+      setAvatarError(false);
+      setAvatarNote("Profile picture removed.");
+      await refreshUser();
+    } catch (err) {
+      setAvatarError(true);
+      setAvatarNote(
+        err instanceof Error ? err.message : "Failed to remove image",
+      );
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
 
   const handleSave = async () => {
     if (saving) return;
@@ -193,7 +259,17 @@ function ProfileEditor({
     <div className={styles.content}>
       {/* Profile identity header */}
       <div className={profileStyles.profileHeader}>
-        <div className={profileStyles.avatar}>{initials}</div>
+        <div className={profileStyles.avatar}>
+          {avatarSrc(avatarUrl) ? (
+            <img
+              src={avatarSrc(avatarUrl) ?? undefined}
+              alt={profile.username}
+              className={profileStyles.avatarImg}
+            />
+          ) : (
+            initials
+          )}
+        </div>
         <div className={profileStyles.identity}>
           <h1 className={profileStyles.username}>
             {profile.username}
@@ -209,21 +285,27 @@ function ProfileEditor({
       <section className={styles.card}>
         <div className={styles.cardHeader}>
           <div>
-            <h2 className={styles.cardTitle}>Public Profile</h2>
+            <h2 className={styles.cardTitle}>Profile</h2>
             <p className={styles.cardSubtitle}>
-              Manage your developer persona, course authorship bio, and public stats
+              Manage your persona, bio, and public stats
             </p>
           </div>
-          <span className={styles.visibilityPill}>
-            <Eye size={12} />
-            Visible to classmates
-          </span>
         </div>
 
         <hr className={styles.divider} />
 
         <div className={styles.pictureRow}>
-          <div className={styles.avatarLarge}>{initials}</div>
+          <div className={styles.avatarLarge}>
+            {avatarSrc(avatarUrl) ? (
+              <img
+                src={avatarSrc(avatarUrl) ?? undefined}
+                alt={profile.username}
+                className={styles.avatarLargeImg}
+              />
+            ) : (
+              initials
+            )}
+          </div>
           <div className={styles.pictureInfo}>
             <p className={styles.pictureTitle}>Profile Picture</p>
             <p className={styles.pictureDesc}>
@@ -232,10 +314,41 @@ function ProfileEditor({
             </p>
           </div>
           <div className={styles.pictureActions}>
-            <button className={styles.secondaryButton}>Upload New</button>
-            <button className={styles.dangerTextButton}>Reset Avatar</button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handleAvatarFile}
+            />
+            <button
+              className={styles.secondaryButton}
+              disabled={avatarBusy}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {avatarBusy ? "Uploading..." : "Upload New"}
+            </button>
+            {avatarUrl && (
+              <button
+                className={styles.iconDangerButton}
+                disabled={avatarBusy}
+                onClick={handleRemoveAvatar}
+                aria-label="Remove profile picture"
+                title="Remove profile picture"
+              >
+                <Trash2 size={16} />
+              </button>
+            )}
           </div>
         </div>
+        {avatarNote && (
+          <p
+            className={styles.helper}
+            style={{ marginTop: 10, color: avatarError ? "#dc2626" : "#059669" }}
+          >
+            {avatarNote}
+          </p>
+        )}
 
         <hr className={styles.divider} />
 

@@ -1,8 +1,10 @@
 # --- Node.js / Dependencies ---
+
 node_modules/
 **/node_modules/
 .pnp
 .pnp.js
+.opencode
 
 # --- Build Output ---
 dist/
@@ -43,6 +45,9 @@ next-env.d.ts
 
 # Coverage (from backend)
 /coverage
+
+# Runtime uploads (profile pictures stored locally)
+backend/uploads/
 
 # Misc security
 *.pem

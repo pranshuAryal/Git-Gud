@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -40,6 +41,11 @@ export class MergeRequestService {
       include: { forkedFrom: { select: { id: true, name: true } } },
     });
     if (!repo) throw new NotFoundException('Repository not found');
+    if (!repo.isPublic && repo.ownerId !== userId) {
+      throw new ForbiddenException(
+        'Cannot create a merge request against a private repository',
+      );
+    }
 
     const note = await this.prisma.note.findFirst({
       where: { id: dto.noteId, section: { repoId: dto.repoId } },
@@ -68,6 +74,20 @@ export class MergeRequestService {
       targetRepoId = repo.forkedFrom.id;
       targetRepoName = repo.forkedFrom.name;
       targetNote = { id: originNote.id, content: originNote.content };
+    }
+
+    const existingPending = await this.prisma.mergeRequest.findFirst({
+      where: {
+        repoId: targetRepoId,
+        noteId: targetNote.id,
+        submittedBy: userId,
+        status: 'pending',
+      },
+    });
+    if (existingPending) {
+      throw new ConflictException(
+        'You already have a pending merge request for this note',
+      );
     }
 
     const mr = await this.prisma.mergeRequest.create({
@@ -179,30 +199,30 @@ export class MergeRequestService {
       );
     }
 
-    if (dto.status === MergeRequestStatus.APPROVED) {
-      const content = mr.newContent as Prisma.InputJsonValue;
-      await this.prisma.$transaction([
-        this.prisma.note.update({
+    return this.prisma.$transaction(async (tx) => {
+      if (dto.status === MergeRequestStatus.APPROVED) {
+        const content = mr.newContent as Prisma.InputJsonValue;
+        await tx.note.update({
           where: { id: mr.note.id },
           data: { content },
-        }),
-        this.prisma.version.create({
+        });
+        await tx.version.create({
           data: {
             noteId: mr.note.id,
             editedBy: mr.submittedBy,
             content,
             changeSummary: `Approved merge request: ${mr.title}`,
           },
-        }),
-      ]);
-    }
+        });
+      }
 
-    return this.prisma.mergeRequest.update({
-      where: { id: mrId },
-      data: {
-        status: dto.status,
-        ...(dto.feedback !== undefined && { feedback: dto.feedback }),
-      },
+      return tx.mergeRequest.update({
+        where: { id: mrId },
+        data: {
+          status: dto.status,
+          ...(dto.feedback !== undefined && { feedback: dto.feedback }),
+        },
+      });
     });
   }
 

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import styles from "./CSS/sidePanel.module.css";
 import { useLayout } from "@/app/context/LayoutContext";
 import { useAuth } from "@/app/context/AuthContext";
+import { avatarSrc } from "@/lib/format";
 
 export default function SidePanel() {
   const pathname = usePathname();
@@ -92,7 +93,17 @@ export default function SidePanel() {
 
       {/* User Footer Profile Card */}
       <div className={styles.userFooter}>
-        <div className={styles.avatar}>{initials}</div>
+        <div className={styles.avatar}>
+          {avatarSrc(user?.avatarUrl) ? (
+            <img
+              src={avatarSrc(user?.avatarUrl) ?? undefined}
+              alt={user?.username || "avatar"}
+              className={styles.avatarImg}
+            />
+          ) : (
+            initials
+          )}
+        </div>
         <div className={styles.userInfo}>
           <div className={styles.userName}>{user?.username || "Loading…"}</div>
           <div className={styles.userMeta}>{user?.email || "Please wait"}</div>

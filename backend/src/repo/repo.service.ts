@@ -16,6 +16,22 @@ import { CreateSectionDto } from './dto/create-section.dto';
 import { UpdateSectionDto } from './dto/update-section.dto';
 import { SaveNoteDto } from './dto/save-note.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { join } from 'path';
+import { mkdirSync } from 'fs';
+import { promises as fs } from 'fs';
+import { Prisma } from '@prisma/client';
+
+export const AVATARS_DIR = join(process.cwd(), 'uploads', 'avatars');
+mkdirSync(AVATARS_DIR, { recursive: true });
+
+export interface UploadedAvatarFile {
+  fieldname: string;
+  originalname: string;
+  mimetype: string;
+  path: string;
+  size: number;
+  filename: string;
+}
 
 const CARD_SELECT = {
   id: true,
@@ -48,7 +64,18 @@ export class RepoService {
     dto: CreateRepositoryDto,
     forkedFromId?: string,
   ) {
-    const existing = await this.prisma.repository.findUnique({
+    return this.prisma.$transaction((tx) =>
+      this.createRepositoryInTx(ownerId, dto, forkedFromId, tx),
+    );
+  }
+
+  private async createRepositoryInTx(
+    ownerId: string,
+    dto: CreateRepositoryDto,
+    forkedFromId: string | undefined,
+    tx: Prisma.TransactionClient,
+  ) {
+    const existing = await tx.repository.findUnique({
       where: { ownerId_name: { ownerId, name: dto.name } },
     });
     if (existing) {
@@ -57,8 +84,9 @@ export class RepoService {
       );
     }
 
-    return this.prisma.$transaction(async (tx) => {
-      const repo = await tx.repository.create({
+    let repo;
+    try {
+      repo = await tx.repository.create({
         data: {
           ownerId,
           name: dto.name,
@@ -67,38 +95,48 @@ export class RepoService {
           forkedFromId: forkedFromId ?? null,
         },
       });
+    } catch (err) {
+      if (
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === 'P2002'
+      ) {
+        throw new ConflictException(
+          'You already have a repository with this name',
+        );
+      }
+      throw err;
+    }
 
-      const createdNotes: { noteId: string; content: any }[] = [];
+    const createdNotes: { noteId: string; content: any }[] = [];
 
-      const createSectionTree = async (
-        sections: SectionInput[] | undefined,
-        parentId: string | null,
-      ) => {
-        if (!sections) return;
-        for (const s of sections) {
-          const section = await tx.section.create({
-            data: { repoId: repo.id, parentId, title: s.title, order: s.order },
+    const createSectionTree = async (
+      sections: SectionInput[] | undefined,
+      parentId: string | null,
+    ) => {
+      if (!sections) return;
+      for (const s of sections) {
+        const section = await tx.section.create({
+          data: { repoId: repo.id, parentId, title: s.title, order: s.order },
+        });
+
+        if (s.note) {
+          const note = await tx.note.create({
+            data: {
+              sectionId: section.id,
+              content: s.note.content,
+              originNoteId: s.note.originNoteId ?? null,
+            },
           });
-
-          if (s.note) {
-            const note = await tx.note.create({
-              data: {
-                sectionId: section.id,
-                content: s.note.content,
-                originNoteId: s.note.originNoteId ?? null,
-              },
-            });
-            createdNotes.push({ noteId: note.id, content: s.note.content });
-          }
-
-          await createSectionTree(s.children, section.id);
+          createdNotes.push({ noteId: note.id, content: s.note.content });
         }
-      };
 
-      await createSectionTree(dto.sections, null);
+        await createSectionTree(s.children, section.id);
+      }
+    };
 
-      return { repo, createdNotes };
-    });
+    await createSectionTree(dto.sections, null);
+
+    return { repo, createdNotes };
   }
 
   async findRepositories(userId: string, query: ListRepositoriesQueryDto) {
@@ -170,7 +208,22 @@ export class RepoService {
 
   async updateRepository(userId: string, id: string, dto: UpdateRepositoryDto) {
     const repo = await this.assertOwnership(userId, id);
-    return this.prisma.repository.update({ where: { id: repo.id }, data: dto });
+    try {
+      return await this.prisma.repository.update({
+        where: { id: repo.id },
+        data: dto,
+      });
+    } catch (err) {
+      if (
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === 'P2002'
+      ) {
+        throw new ConflictException(
+          'You already have a repository with this name',
+        );
+      }
+      throw err;
+    }
   }
 
   async deleteRepository(userId: string, id: string) {
@@ -196,38 +249,40 @@ export class RepoService {
     const name = await this.resolveForkName(userId, original.name);
     const sectionTree = this.buildSectionTree(original.sections);
 
-    const { repo, createdNotes } = await this.createRepository(
-      userId,
-      {
-        name,
-        description: original.description ?? undefined,
-        isPublic: original.isPublic,
-        sections: sectionTree,
-      },
-      original.id,
-    );
+    return this.prisma.$transaction(async (tx) => {
+      const { repo, createdNotes } = await this.createRepositoryInTx(
+        userId,
+        {
+          name,
+          description: original.description ?? undefined,
+          isPublic: original.isPublic,
+          sections: sectionTree,
+        },
+        original.id,
+        tx,
+      );
 
-    await this.prisma.$transaction([
-      ...createdNotes.map((n) =>
-        this.prisma.version.create({
+      for (const n of createdNotes) {
+        await tx.version.create({
           data: {
             noteId: n.noteId,
             editedBy: userId,
             content: n.content,
             changeSummary: `Forked from "${original.name}"`,
           },
-        }),
-      ),
-      this.prisma.fork.create({
+        });
+      }
+
+      await tx.fork.create({
         data: {
           originalRepoId: original.id,
           forkedRepoId: repo.id,
           forkedBy: userId,
         },
-      }),
-    ]);
+      });
 
-    return repo;
+      return repo;
+    });
   }
 
   // ================= SECTIONS =================
@@ -291,6 +346,11 @@ export class RepoService {
           'Target section already has a note attached',
         );
       }
+      if (await this.wouldCreateCycle(sectionId, dto.parentId)) {
+        throw new BadRequestException(
+          'A section cannot be moved inside its own sub-section',
+        );
+      }
     }
 
     return this.prisma.section.update({
@@ -337,7 +397,10 @@ export class RepoService {
     }
 
     return this.prisma.note.create({
-      data: { sectionId, content: {} },
+      data: {
+        sectionId,
+        content: { type: 'doc', content: [{ type: 'paragraph' }] },
+      },
     });
   }
 
@@ -404,7 +467,7 @@ export class RepoService {
       lastVersion: versions[0]
         ? { editedBy: versions[0].editor, createdAt: versions[0].createdAt }
         : null,
-      versionNumber: versions.length ? 1 : 0,
+      versionNumber: versions.length,
       versions: versions.slice(0, 10).map((v) => ({
         id: v.id,
         changeSummary: v.changeSummary,
@@ -415,6 +478,15 @@ export class RepoService {
   }
 
   async listNoteVersions(userId: string, repoId: string, noteId: string) {
+    const repo = await this.prisma.repository.findUnique({
+      where: { id: repoId },
+      select: { isPublic: true, ownerId: true },
+    });
+    if (!repo) throw new NotFoundException('Repository not found');
+    if (!repo.isPublic && repo.ownerId !== userId) {
+      throw new ForbiddenException('This repository is private');
+    }
+
     const note = await this.prisma.note.findFirst({
       where: { id: noteId, section: { repoId } },
     });
@@ -436,6 +508,9 @@ export class RepoService {
       where: { id: repoId },
     });
     if (!repo) throw new NotFoundException('Repository not found');
+    if (repo.ownerId === userId) {
+      throw new BadRequestException('You cannot star your own repository');
+    }
 
     const existing = await this.prisma.star.findUnique({
       where: { userId_repoId: { userId, repoId } },
@@ -477,6 +552,7 @@ export class RepoService {
         username: true,
         name: true,
         bio: true,
+        avatarUrl: true,
         createdAt: true,
       },
     });
@@ -529,7 +605,14 @@ export class RepoService {
           },
         },
       }),
-      this.prisma.mergeRequest.count({ where: { repo: { ownerId: userId } } }),
+      this.prisma.mergeRequest.count({
+        where: {
+          repo: {
+            ownerId: userId,
+            ...(isSelf ? {} : { isPublic: true }),
+          },
+        },
+      }),
       this.prisma.mergeRequest.count({ where: { submittedBy: userId } }),
     ]);
 
@@ -539,6 +622,7 @@ export class RepoService {
         username: user.username,
         name: user.name,
         bio: user.bio,
+        avatarUrl: user.avatarUrl,
         createdAt: user.createdAt,
       },
       isSelf,
@@ -564,6 +648,14 @@ export class RepoService {
 
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
+      select: {
+        id: true,
+        username: true,
+        name: true,
+        bio: true,
+        avatarUrl: true,
+        createdAt: true,
+      },
     });
     if (!user) throw new NotFoundException('User not found');
 
@@ -598,7 +690,86 @@ export class RepoService {
     return { profile: updated };
   }
 
+  async uploadUserAvatar(
+    viewerId: string,
+    userId: string,
+    file: UploadedAvatarFile,
+  ) {
+    if (viewerId !== userId) {
+      await fs.unlink(file.path).catch(() => undefined);
+      throw new ForbiddenException('You can only update your own profile');
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, avatarUrl: true },
+    });
+    if (!user) {
+      await fs.unlink(file.path).catch(() => undefined);
+      throw new NotFoundException('User not found');
+    }
+
+    const publicUrl = `/uploads/avatars/${file.filename}`;
+
+    if (user.avatarUrl) {
+      const oldPath = join(process.cwd(), user.avatarUrl.replace(/^\//, ''));
+      await fs.unlink(oldPath).catch(() => undefined);
+    }
+
+    try {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { avatarUrl: publicUrl },
+      });
+    } catch (err) {
+      await fs.unlink(file.path).catch(() => undefined);
+      throw err;
+    }
+
+    return { profile: { id: user.id, avatarUrl: publicUrl } };
+  }
+
+  async deleteUserAvatar(viewerId: string, userId: string) {
+    if (viewerId !== userId) {
+      throw new ForbiddenException('You can only update your own profile');
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, avatarUrl: true },
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    if (user.avatarUrl) {
+      const oldPath = join(process.cwd(), user.avatarUrl.replace(/^\//, ''));
+      await fs.unlink(oldPath).catch(() => undefined);
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { avatarUrl: null },
+    });
+
+    return { profile: { id: user.id, avatarUrl: null } };
+  }
+
   // ================= PRIVATE HELPERS =================
+
+  private async wouldCreateCycle(
+    sectionId: string,
+    newParentId: string,
+  ): Promise<boolean> {
+    let current: string | null = newParentId;
+    while (current) {
+      if (current === sectionId) return true;
+      const parent = await this.prisma.section.findUnique({
+        where: { id: current },
+        select: { parentId: true },
+      });
+      current = parent?.parentId ?? null;
+    }
+    return false;
+  }
 
   private async assertOwnership(userId: string, repoId: string) {
     const repo = await this.prisma.repository.findUnique({

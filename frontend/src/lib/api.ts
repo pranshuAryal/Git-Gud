@@ -4,6 +4,7 @@ export interface AuthUser {
   userId: string;
   email: string;
   username: string;
+  avatarUrl: string | null;
 }
 
 export function fetchMe(): Promise<AuthUser> {
@@ -141,7 +142,14 @@ export function createNote(repoId: string, sectionId: string) {
 }
 
 export interface ProfileData {
-  profile: { id: string; username: string; name: string | null; bio: string | null; createdAt: string };
+  profile: {
+    id: string;
+    username: string;
+    name: string | null;
+    bio: string | null;
+    avatarUrl: string | null;
+    createdAt: string;
+  };
   isSelf: boolean;
   counts: {
     repositories: number;
@@ -165,4 +173,22 @@ export function updateProfile(
     method: "PATCH",
     body: JSON.stringify(payload),
   });
+}
+
+export function uploadAvatar(
+  userId: string,
+  file: File,
+): Promise<{ profile: { id: string; avatarUrl: string } }> {
+  const formData = new FormData();
+  formData.append("file", file);
+  return apiFetch(`/profiles/${userId}/avatar`, {
+    method: "POST",
+    body: formData,
+  });
+}
+
+export function deleteAvatar(
+  userId: string,
+): Promise<{ profile: { id: string; avatarUrl: null } }> {
+  return apiFetch(`/profiles/${userId}/avatar`, { method: "DELETE" });
 }
