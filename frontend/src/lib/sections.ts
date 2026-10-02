@@ -48,11 +48,3 @@ export function flattenTree(
   }
   return result;
 }
-
-export function findSection(
-  flat: FlattenedSection[],
-  id: string | null,
-): SectionNode | undefined {
-  if (!id) return undefined;
-  return flat.find((f) => f.node.id === id)?.node;
-}

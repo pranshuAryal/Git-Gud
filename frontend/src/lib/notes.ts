@@ -147,24 +147,6 @@ export interface VersionData {
   editor: { id: string; username: string };
 }
 
-export interface NoteData {
-  id: string;
-  content: NoteContent;
-  updatedAt: string;
-  section: { id: string; title: string };
-  lastVersion: {
-    editedBy: { id: string; username: string };
-    createdAt: string;
-  } | null;
-  versionNumber: number;
-  versions: {
-    id: string;
-    changeSummary: string | null;
-    createdAt: string;
-    editedBy: { id: string; username: string };
-  }[];
-}
-
 export function saveNote(
   repoId: string,
   noteId: string,
@@ -175,10 +157,6 @@ export function saveNote(
     method: "PATCH",
     body: JSON.stringify({ content, changeSummary }),
   });
-}
-
-export function fetchNote(repoId: string, noteId: string): Promise<NoteData> {
-  return apiFetch(`/repositories/${repoId}/notes/${noteId}`);
 }
 
 export function fetchNoteVersions(

@@ -89,15 +89,6 @@
   opacity: 1;
 }
 
-.dragHandle {
-  display: flex;
-  align-items: center;
-  color: #d1d5db;
-  cursor: grab;
-  flex-shrink: 0;
-  padding: 2px;
-}
-
 .chevronButton {
   display: flex;
   align-items: center;
@@ -122,13 +113,6 @@
   width: 16px;
 }
 
-.rowIcon {
-  color: #534ab7;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
 .rowTitle {
   flex: 1;
   font-size: 13px;
@@ -137,11 +121,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.rowTitleLeaf {
-  color: #374151;
-  font-weight: 400;
 }
 
 .rowActions {
@@ -188,51 +167,4 @@
 .deleteButton:hover:not(:disabled) {
   background: #fef2f2 !important;
   color: #dc2626 !important;
-}
-
-.childAddRow {
-  display: flex;
-  gap: 8px;
-  padding: 6px 10px;
-  margin: 2px 0;
-}
-
-.childAddInput {
-  flex: 1;
-  padding: 6px 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 12px;
-  color: #111827;
-  background: #ffffff;
-  outline: none;
-  font-family: inherit;
-}
-
-.childAddInput::placeholder {
-  color: #9ca3af;
-}
-
-.childAddInput:focus {
-  border-color: #534ab7;
-  box-shadow: 0 0 0 2px rgba(83, 74, 183, 0.1);
-}
-
-.childAddButton {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  background: #534ab7;
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.childAddButton:hover {
-  background: #463da0;
 }
